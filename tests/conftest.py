@@ -33,4 +33,11 @@ def dummy_houjinbangou_search_json():
 
     with open(os.path.join(here, "houjinbangou_search.json")) as f:
         return json.load(f)
-    
+
+
+@pytest.fixture
+def dummy_holiday_search_json():
+    import json
+
+    with open(os.path.join(here, "holiday_search.json")) as f:
+        return json.load(f)    
