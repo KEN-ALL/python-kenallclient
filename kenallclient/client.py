@@ -161,12 +161,12 @@ class KenAllClient:
 
     def create_search_holiday_request(self,
         year: Optional[int] = None,
-        from_: Optional[int] = None,
-        to: Optional[int] = None) -> urllib.request.Request:
+        from_: Optional[str] = None,
+        to: Optional[str] = None) -> urllib.request.Request:
         query_mapping: List[Tuple[str, Optional[str]]] = [
-            ("year", str(year)),
-            ("from", str(from_)),
-            ("to", str(to)),
+            ("year", str(year) if year is not None else None),
+            ("from", str(from_) if from_ is not None else None),
+            ("to", str(to) if to is not None else None),
         ]
 
         query = urllib.parse.urlencode(
@@ -186,12 +186,18 @@ class KenAllClient:
     def search_holiday(
         self,
         year: Optional[int] = None,
-        from_: Optional[int] = None,
-        to: Optional[int] = None,
+        from_: Optional[str] = None,
+        to: Optional[str] = None,
     ) -> HolidaySearchResult:
+        import urllib.error
         req = self.create_search_holiday_request(
             year=year,
             from_=from_,
             to=to,
         )
-        return self.fetch_search_holiday_result(req)
+        try:
+            return self.fetch_search_holiday_result(req)
+        except urllib.error.HTTPError as e:
+            print(e)
+            print(json.load(e))
+            raise
