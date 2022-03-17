@@ -1,6 +1,9 @@
 import io
 import pytest
 
+from tests.conftest import dummy_holiday_search_json
+
+
 class DummyResponse(io.StringIO):
     headers: dict = {}
 
@@ -18,6 +21,7 @@ def test_it():
 )
 def test_api_url(api_url, expected):
     from kenallclient.client import KenAllClient
+
     target = KenAllClient("testing-api-key", api_url=api_url)
     assert target.api_url == expected
 
@@ -54,6 +58,7 @@ def test_fetch(mocker, dummy_json):
     result = target.fetch(request)
     mock_urlopen.assert_called_with(request)
     assert result
+
 
 def test_fetch_unexpected_content_type(mocker, dummy_json):
     import json
@@ -102,3 +107,119 @@ def test_fetch_search_houjin_result(mocker, dummy_houjinbangou_search_json):
     result = target.fetch_search_houjin_result(request)
     mock_urlopen.assert_called_with(request)
     assert result
+
+
+def test_fetch_search_holiday_result(mocker, dummy_holiday_search_json):
+    import json
+    from kenallclient.client import KenAllClient
+    from kenallclient import model
+
+    dummy_response = DummyResponse(json.dumps(dummy_holiday_search_json))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    request = mocker.Mock()
+    target = KenAllClient("testing-api-key")
+    result = target.fetch_search_holiday_result(request)
+    mock_urlopen.assert_called_with(request)
+    assert result == model.HolidaySearchResult(
+        data=[
+            model.Holiday(
+                title="元日",
+                date="2022-01-01",
+                day_of_week=6,
+                day_of_week_text="saturday",
+            ),
+            model.Holiday(
+                title="成人の日",
+                date="2022-01-10",
+                day_of_week=1,
+                day_of_week_text="monday",
+            ),
+            model.Holiday(
+                title="建国記念の日",
+                date="2022-02-11",
+                day_of_week=5,
+                day_of_week_text="friday",
+            ),
+            model.Holiday(
+                title="天皇誕生日",
+                date="2022-02-23",
+                day_of_week=3,
+                day_of_week_text="wednesday",
+            ),
+            model.Holiday(
+                title="春分の日",
+                date="2022-03-21",
+                day_of_week=1,
+                day_of_week_text="monday",
+            ),
+            model.Holiday(
+                title="昭和の日",
+                date="2022-04-29",
+                day_of_week=5,
+                day_of_week_text="friday",
+            ),
+            model.Holiday(
+                title="憲法記念日",
+                date="2022-05-03",
+                day_of_week=2,
+                day_of_week_text="tuesday",
+            ),
+            model.Holiday(
+                title="みどりの日",
+                date="2022-05-04",
+                day_of_week=3,
+                day_of_week_text="wednesday",
+            ),
+            model.Holiday(
+                title="こどもの日",
+                date="2022-05-05",
+                day_of_week=4,
+                day_of_week_text="thursday",
+            ),
+            model.Holiday(
+                title="海の日",
+                date="2022-07-18",
+                day_of_week=1,
+                day_of_week_text="monday",
+            ),
+            model.Holiday(
+                title="山の日",
+                date="2022-08-11",
+                day_of_week=4,
+                day_of_week_text="thursday",
+            ),
+            model.Holiday(
+                title="敬老の日",
+                date="2022-09-19",
+                day_of_week=1,
+                day_of_week_text="monday",
+            ),
+            model.Holiday(
+                title="秋分の日",
+                date="2022-09-23",
+                day_of_week=5,
+                day_of_week_text="friday",
+            ),
+            model.Holiday(
+                title="スポーツの日",
+                date="2022-10-10",
+                day_of_week=1,
+                day_of_week_text="monday",
+            ),
+            model.Holiday(
+                title="文化の日",
+                date="2022-11-03",
+                day_of_week=4,
+                day_of_week_text="thursday",
+            ),
+            model.Holiday(
+                title="勤労感謝の日",
+                date="2022-11-23",
+                day_of_week=3,
+                day_of_week_text="wednesday",
+            ),
+        ]
+    )

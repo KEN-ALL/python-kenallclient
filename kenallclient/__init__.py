@@ -26,7 +26,10 @@ def make_parser() -> argparse.ArgumentParser:
     search_houjin_parser.add_argument("--facet-kind")
     search_houjin_parser.add_argument("--facet-process")
     search_houjin_parser.add_argument("--facet-close-cause")
-
+    search_holiday_parser = subparsers.add_parser("search-holiday")
+    search_holiday_parser.add_argument("--year", type=int)
+    search_holiday_parser.add_argument("--from", dest="from_")
+    search_holiday_parser.add_argument("--to", )
     return parser
 
     
@@ -66,6 +69,16 @@ def main() -> None:
                     facet_kind=args.facet_kind,
                     facet_process=args.facet_process,
                     facet_close_cause=args.facet_close_cause,
+                ),
+            ),
+        )
+    elif args.command == "search-holiday":
+        pprint(
+            dataclasses.asdict(
+                client.search_holiday(
+                    year=args.year,
+                    from_=args.from_,
+                    to=args.to,
                 ),
             ),
         )

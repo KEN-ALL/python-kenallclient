@@ -7,9 +7,9 @@ class TestKenAllSearchResult:
         assert result == model.KenAllSearchResult(
             version="2021-02-26",
             query="神奈川県 AND 日本郵便",
-            count= 3,
-            offset= 0,
-            limit= 100,
+            count=3,
+            offset=0,
+            limit=100,
             facets=[
                 ("/神奈川県", 3),
             ],
@@ -141,4 +141,109 @@ class TestKenAllResult:
                     ),
                 )
             ],
+        )
+
+
+class TestHolidaySearchResult:
+    def test_fromdict(self, dummy_holiday_search_json):
+        result = model.HolidaySearchResult.fromdict(dummy_holiday_search_json)
+        assert result == model.HolidaySearchResult(
+            data=[
+                model.Holiday(
+                    title="元日",
+                    date="2022-01-01",
+                    day_of_week=6,
+                    day_of_week_text="saturday",
+                ),
+                model.Holiday(
+                    title="成人の日",
+                    date="2022-01-10",
+                    day_of_week=1,
+                    day_of_week_text="monday",
+                ),
+                model.Holiday(
+                    title="建国記念の日",
+                    date="2022-02-11",
+                    day_of_week=5,
+                    day_of_week_text="friday",
+                ),
+                model.Holiday(
+                    title="天皇誕生日",
+                    date="2022-02-23",
+                    day_of_week=3,
+                    day_of_week_text="wednesday",
+                ),
+                model.Holiday(
+                    title="春分の日",
+                    date="2022-03-21",
+                    day_of_week=1,
+                    day_of_week_text="monday",
+                ),
+                model.Holiday(
+                    title="昭和の日",
+                    date="2022-04-29",
+                    day_of_week=5,
+                    day_of_week_text="friday",
+                ),
+                model.Holiday(
+                    title="憲法記念日",
+                    date="2022-05-03",
+                    day_of_week=2,
+                    day_of_week_text="tuesday",
+                ),
+                model.Holiday(
+                    title="みどりの日",
+                    date="2022-05-04",
+                    day_of_week=3,
+                    day_of_week_text="wednesday",
+                ),
+                model.Holiday(
+                    title="こどもの日",
+                    date="2022-05-05",
+                    day_of_week=4,
+                    day_of_week_text="thursday",
+                ),
+                model.Holiday(
+                    title="海の日",
+                    date="2022-07-18",
+                    day_of_week=1,
+                    day_of_week_text="monday",
+                ),
+                model.Holiday(
+                    title="山の日",
+                    date="2022-08-11",
+                    day_of_week=4,
+                    day_of_week_text="thursday",
+                ),
+                model.Holiday(
+                    title="敬老の日",
+                    date="2022-09-19",
+                    day_of_week=1,
+                    day_of_week_text="monday",
+                ),
+                model.Holiday(
+                    title="秋分の日",
+                    date="2022-09-23",
+                    day_of_week=5,
+                    day_of_week_text="friday",
+                ),
+                model.Holiday(
+                    title="スポーツの日",
+                    date="2022-10-10",
+                    day_of_week=1,
+                    day_of_week_text="monday",
+                ),
+                model.Holiday(
+                    title="文化の日",
+                    date="2022-11-03",
+                    day_of_week=4,
+                    day_of_week_text="thursday",
+                ),
+                model.Holiday(
+                    title="勤労感謝の日",
+                    date="2022-11-23",
+                    day_of_week=3,
+                    day_of_week_text="wednesday",
+                ),
+            ]
         )

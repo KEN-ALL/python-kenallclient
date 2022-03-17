@@ -50,6 +50,13 @@ HoujinSearchResult(version='2022-02-17', data=[{'published_date': '2022-01-31', 
 
 ```
 
+`search_holiday` method gets holidays.
+
+```
+>>> client.search_holiday(from_="2022-01-01", to="2022-02-01")
+HolidaySearchResult(data=[Holiday(title='元日', date='2022-01-01', day_of_week=6, day_of_week_text='saturday'), Holiday(title='成人の日', date='2022-01-10', day_of_week=1, day_of_week_text='monday')])
+```
+
 ### module command
 
 To use kenallclient in command line, call kenallclient module.
@@ -188,3 +195,17 @@ $ python -m kenallclient get-houjin 2021001052596
           'update_date': '2021-01-12'},
  'version': '2022-02-17'}
  ```
+
+
+### get holidays
+```
+$ python -m kenallclient search-holiday --from 2022-01-01 --to 2022-02-01
+{'data': [{'date': '2022-01-01',
+           'day_of_week': 6,
+           'day_of_week_text': 'saturday',
+           'title': '元日'},
+          {'date': '2022-01-10',
+           'day_of_week': 1,
+           'day_of_week_text': 'monday',
+           'title': '成人の日'}]}
+```
