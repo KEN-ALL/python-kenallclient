@@ -223,3 +223,55 @@ def test_fetch_search_holiday_result(mocker, dummy_holiday_search_json):
             ),
         ]
     )
+
+
+def test_handle_response_200(mocker, dummy_json):
+    import json
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(dummy_json))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    request = mocker.Mock()
+    target = KenAllClient("testing-api-key")
+    result = target._handle_response(request)
+    mock_urlopen.assert_called_with(request)
+    assert result
+
+
+def test_handle_response_404(mocker, dummy_json):
+    import json
+    from urllib.error import HTTPError
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(dummy_json))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.side_effect = HTTPError("dummy", 404, "dummy", None, None)
+
+    request = mocker.Mock()
+    target = KenAllClient("testing-api-key")
+    result = target._handle_response(request)
+    mock_urlopen.assert_called_with(request)
+    assert result is False
+
+
+def test_handle_response_400(mocker, dummy_json):
+    import json
+    from urllib.error import HTTPError
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(dummy_json))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.side_effect = HTTPError("dummy", 400, "dummy", None, None)
+
+    request = mocker.Mock()
+    target = KenAllClient("testing-api-key")
+    with pytest.raises(Exception) as e:
+        _ = target._handle_response(request)
+
+    mock_urlopen.assert_called_with(request)
+    assert str(e.value) == "('not valid http-response code', 'dummy')"

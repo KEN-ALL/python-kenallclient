@@ -1,6 +1,7 @@
 import json
 import urllib.parse
 import urllib.request
+from urllib.error import HTTPError
 from typing import Dict, List, Optional, Tuple
 
 from kenallclient.model import (
@@ -40,6 +41,20 @@ class KenAllClient:
     def get(self, postal_code: str) -> KenAllResult:
         req = self.create_request(postal_code)
         return self.fetch(req)
+
+    def exists_postal_code(self, postal_code: str) -> bool:
+        req = self.create_request(postal_code)
+        return self._handle_response(req)
+
+    def _handle_response(self, req: urllib.request.Request) -> bool:
+        try:
+            with urllib.request.urlopen(req):
+                return True
+        except HTTPError as e:
+            if e.code == 404:
+                return False
+            else:
+                raise ValueError("not valid http-response code", e.reason)
 
     def create_search_request(
         self,
