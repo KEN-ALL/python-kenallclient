@@ -1,0 +1,49 @@
+{
+  "version": "2024-01-01",
+  "data": [
+    {
+      "jisx0402": "13101",
+      "old_code": "100",
+      "postal_code": "1008105",
+      "prefecture_kana": "トウキョウト",
+      "city_kana": "チヨダク",
+      "town_kana": "オオテマチ",
+      "town_kana_raw": "オオテマチ",
+      "prefecture": "東京都",
+      "city": "千代田区",
+      "town": "大手町",
+      "koaza": "",
+      "kyoto_street": "",
+      "building": "新大手町ビル",
+      "floor": "5階",
+      "town_partial": false,
+      "town_addressed_koaza": false,
+      "town_chome": true,
+      "town_multi": false,
+      "town_raw": "大手町",
+      "corporation": {
+        "name": "チッソ　株式会社",
+        "name_kana": "ﾁﾂｿ ｶﾌﾞｼｷｶﾞｲｼﾔ",
+        "block_lot": "２丁目２－１（新大手町ビル）",
+        "block_lot_num": "2-2-1",
+        "post_office": "銀座",
+        "code_type": 0
+      },
+      "prefecture_roman": "Tokyo",
+      "city_roman": "Chiyoda-ku",
+      "town_roman": "Otemachi",
+      "county": "",
+      "county_kana": "",
+      "county_roman": "",
+      "city_without_county_and_ward": "千代田区",
+      "city_without_county_and_ward_kana": "チヨダク",
+      "city_without_county_and_ward_roman": "Chiyoda-ku",
+      "city_ward": "",
+      "city_ward_kana": "",
+      "city_ward_roman": "",
+      "town_jukyohyoji": false,
+      "update_status": 0,
+      "update_reason": 0
+    }
+  ]
+}

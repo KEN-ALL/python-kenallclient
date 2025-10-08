@@ -1,0 +1,35 @@
+{
+  "version": "2023-09-01",
+  "data": {
+    "bank": {
+      "code": "0001",
+      "name": "みずほ銀行",
+      "katakana": "ミズホ",
+      "hiragana": "みずほ",
+      "romaji": "mizuho"
+    },
+    "branches": {
+      "001": {
+        "code": "001",
+        "name": "東京営業部",
+        "katakana": "トウキヨウ",
+        "hiragana": "とうきょう",
+        "romaji": "tokyo"
+      },
+      "002": {
+        "code": "002",
+        "name": "本店",
+        "katakana": "ホンテン",
+        "hiragana": "ほんてん",
+        "romaji": "honten"
+      },
+      "026": {
+        "code": "026",
+        "name": "横浜支店",
+        "katakana": "ヨコハマ",
+        "hiragana": "よこはま",
+        "romaji": "yokohama"
+      }
+    }
+  }
+}
