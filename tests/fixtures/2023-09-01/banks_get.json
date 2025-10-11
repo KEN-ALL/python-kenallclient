@@ -1,0 +1,26 @@
+{
+  "version": "2023-09-01",
+  "data": [
+    {
+      "code": "0001",
+      "name": "みずほ銀行",
+      "katakana": "ミズホ",
+      "hiragana": "みずほ",
+      "romaji": "mizuho"
+    },
+    {
+      "code": "0005",
+      "name": "三菱UFJ銀行",
+      "katakana": "ミツビシユーエフジェイ",
+      "hiragana": "みつびしゆーえふじぇい",
+      "romaji": "mitsubishiufj"
+    },
+    {
+      "code": "0009",
+      "name": "三井住友銀行",
+      "katakana": "ミツイスミトモ",
+      "hiragana": "みついすみとも",
+      "romaji": "mitsuisumitomo"
+    }
+  ]
+}

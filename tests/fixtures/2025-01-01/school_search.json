@@ -1,0 +1,87 @@
+{
+  "version": "2025-01-01",
+  "data": [
+    {
+      "code": "F113110102700",
+      "name": "東京大学",
+      "type": "F1",
+      "jurisdiction_prefecture_code": "13",
+      "establishment_type": 1,
+      "branch": 1,
+      "address_raw": "東京都文京区本郷７－３－１",
+      "addresses": [
+        {
+          "jisx0402": "13113",
+          "postal_code": "1130033",
+          "prefecture": "東京都",
+          "prefecture_kana": "トウキョウト",
+          "prefecture_roman": "Tokyo",
+          "city": "文京区",
+          "city_kana": "ブンキョウク",
+          "city_roman": "Bunkyo-ku",
+          "street_number": "本郷７－３－１",
+          "town": "本郷",
+          "kyoto_street": "",
+          "block_lot_num": "7-3-1",
+          "building": "",
+          "floor_room": ""
+        }
+      ],
+      "established_date": "1877-04-12",
+      "abolished_date": null,
+      "school_survey_number": "01A025",
+      "new_code": []
+    },
+    {
+      "code": "F113210103100",
+      "name": "早稲田大学",
+      "type": "F1",
+      "jurisdiction_prefecture_code": "13",
+      "establishment_type": 3,
+      "branch": 1,
+      "address_raw": "東京都新宿区戸塚町１－１０４",
+      "addresses": [
+        {
+          "jisx0402": "13104",
+          "postal_code": "1698050",
+          "prefecture": "東京都",
+          "prefecture_kana": "トウキョウト",
+          "prefecture_roman": "Tokyo",
+          "city": "新宿区",
+          "city_kana": "シンジュクク",
+          "city_roman": "Shinjuku-ku",
+          "street_number": "戸塚町１－１０４",
+          "town": "戸塚町",
+          "kyoto_street": "",
+          "block_lot_num": "1-104",
+          "building": "",
+          "floor_room": ""
+        }
+      ],
+      "established_date": "1920-02-05",
+      "abolished_date": null,
+      "school_survey_number": "02B002",
+      "new_code": []
+    }
+  ],
+  "query": "東京都 AND type:F1",
+  "count": 2,
+  "offset": 0,
+  "limit": 10,
+  "facets": {
+    "area": [
+      ["/東京都/文京区", 1],
+      ["/東京都/新宿区", 1]
+    ],
+    "type": [
+      ["/大学", 2]
+    ],
+    "establishment_type": [
+      ["/国立", 1],
+      ["/私立", 1]
+    ],
+    "branch": [
+      ["/本校", 2]
+    ]
+  }
+}

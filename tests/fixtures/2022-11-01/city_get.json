@@ -1,0 +1,16 @@
+{
+  "version": "2022-11-01",
+  "data": [
+    {
+      "jisx0402": "13101",
+      "prefecture_code": "13",
+      "prefecture": "東京都",
+      "prefecture_kana": "トウキョウト",
+      "prefecture_roman": "Tokyo",
+      "city_code": "101",
+      "city": "千代田区",
+      "city_kana": "チヨダク",
+      "city_roman": "Chiyoda-ku"
+    }
+  ]
+}
