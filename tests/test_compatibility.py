@@ -285,6 +285,33 @@ class TestNTACorporateInfoCompatibility:
         assert isinstance(response.data[0].sequence_number, str)
         assert isinstance(response.data[0].kind, str)
 
+    def test_search_response_api_version_propagates_to_children(
+        self, houjinbangou_search_v20250101
+    ):
+        """Test that api_version is correctly propagated to child NTACorporateInfo.fromdict() calls"""
+        # When we explicitly pass api_version to the searcher response,
+        # it should be propagated to each NTACorporateInfo item in the data list
+        response = compatible.NTACorporateInfoSearcherResponse.fromdict(
+            houjinbangou_search_v20250101, api_version="2025-01-01"
+        )
+
+        # Verify that all items in data were processed with the correct api_version
+        # In v2025-01-01 format, the data has 'address' object that should be flattened
+        for corp_info in response.data:
+            # These fields should exist because api_version was properly propagated
+            # and the v2025-01-01 logic was applied
+            assert hasattr(corp_info, "prefecture_name")
+            assert corp_info.prefecture_name is not None
+
+            # sequence_number and kind should be strings (converted from int in v2025-01-01)
+            assert isinstance(corp_info.sequence_number, str)
+            assert isinstance(corp_info.kind, str)
+
+        # Verify close_cause is converted to string in compatible model
+        closed_corp = response.data[2]
+        assert closed_corp.close_cause == "11"
+        assert isinstance(closed_corp.close_cause, str)
+
 
 class TestBankModelsCompatibility:
     """Test bank models (v2023-09-01+)"""
