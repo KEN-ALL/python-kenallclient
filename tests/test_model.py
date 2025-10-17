@@ -2,10 +2,10 @@ from kenallclient import model
 
 
 class TestKenAllSearchResult:
-    def test_fromdict(self, postalcode_search_v20220901):
-        result = model.KenAllSearchResult.fromdict(postalcode_search_v20220901)
+    def test_fromdict(self, postalcode_search_v20221101):
+        result = model.KenAllSearchResult.fromdict(postalcode_search_v20221101)
         assert result == model.KenAllSearchResult(
-            version="2022-09-01",
+            version="2022-11-01",
             query="千代田",
             count=2,
             offset=0,
@@ -33,6 +33,21 @@ class TestKenAllSearchResult:
                     town_multi=False,
                     town_raw="千代田",
                     corporation=None,
+                    prefecture_roman="Tokyo",
+                    city_roman="Chiyoda-ku",
+                    county="",
+                    county_kana="",
+                    county_roman="",
+                    city_without_county_and_ward="千代田区",
+                    city_without_county_and_ward_kana="チヨダク",
+                    city_without_county_and_ward_roman="Chiyoda-ku",
+                    city_ward="",
+                    city_ward_kana="",
+                    city_ward_roman="",
+                    town_roman="Chiyoda",
+                    town_jukyohyoji=False,
+                    update_status=0,
+                    update_reason=0,
                 ),
                 model.KenAllResultItem(
                     jisx0402="13101",
@@ -55,16 +70,31 @@ class TestKenAllSearchResult:
                     town_multi=False,
                     town_raw="飯田橋",
                     corporation=None,
+                    prefecture_roman="Tokyo",
+                    city_roman="Chiyoda-ku",
+                    county="",
+                    county_kana="",
+                    county_roman="",
+                    city_without_county_and_ward="千代田区",
+                    city_without_county_and_ward_kana="チヨダク",
+                    city_without_county_and_ward_roman="Chiyoda-ku",
+                    city_ward="",
+                    city_ward_kana="",
+                    city_ward_roman="",
+                    town_roman="Iidabashi",
+                    town_jukyohyoji=False,
+                    update_status=0,
+                    update_reason=0,
                 ),
             ],
         )
 
 
 class TestKenAllResult:
-    def test_fromdict(self, postalcode_v20220901):
-        result = model.KenAllResult.fromdict(postalcode_v20220901)
+    def test_fromdict(self, postalcode_v20221101):
+        result = model.KenAllResult.fromdict(postalcode_v20221101)
         assert result == model.KenAllResult(
-            version="2022-11-30",
+            version="2022-11-01",
             data=[
                 model.KenAllResultItem(
                     jisx0402="13101",
@@ -94,6 +124,21 @@ class TestKenAllResult:
                         post_office="銀座",
                         code_type=0,
                     ),
+                    prefecture_roman="Tokyo",
+                    city_roman="Chiyoda-ku",
+                    county="",
+                    county_kana="",
+                    county_roman="",
+                    city_without_county_and_ward="千代田区",
+                    city_without_county_and_ward_kana="チヨダク",
+                    city_without_county_and_ward_roman="Chiyoda-ku",
+                    city_ward="",
+                    city_ward_kana="",
+                    city_ward_roman="",
+                    town_roman="Otemachi",
+                    town_jukyohyoji=False,
+                    update_status=0,
+                    update_reason=0,
                 )
             ],
         )

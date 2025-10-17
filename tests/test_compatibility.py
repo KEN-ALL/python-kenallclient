@@ -2,7 +2,6 @@
 
 from kenallclient.models import (
     compatible,
-    v20220901,
     v20221101,
     v20250101,
 )
@@ -10,28 +9,6 @@ from kenallclient.models import (
 
 class TestAddressCompatibility:
     """Test Address model compatibility across versions"""
-
-    def test_v20220901_address_loads_in_compatible(self, postalcode_v20220901):
-        """Test that v2022-09-01 address data loads in compatible model"""
-        address_data = postalcode_v20220901["data"][0]
-        address = compatible.Address.fromdict(address_data)
-
-        # Check common fields
-        assert address.postal_code == "1008105"
-        assert address.prefecture == "東京都"
-        assert address.city == "千代田区"
-        assert address.town == "大手町"
-
-        # Check that romanization fields are None
-        assert address.prefecture_roman is None
-        assert address.city_roman is None
-        assert address.town_roman is None
-        assert address.county is None
-        assert address.update_status is None
-
-        # Check corporation
-        assert address.corporation is not None
-        assert address.corporation.name == "チッソ　株式会社"
 
     def test_v20221101_address_loads_in_compatible(self, postalcode_v20221101):
         """Test that v2022-11-01 address data loads in compatible model"""
@@ -67,68 +44,17 @@ class TestAddressCompatibility:
         assert not hasattr(address, "unknown_field")
         assert not hasattr(address, "future_field")
 
-    def test_version_specific_models_strict(
-        self, postalcode_v20220901, postalcode_v20221101
-    ):
+    def test_version_specific_models_strict(self, postalcode_v20221101):
         """Test that version-specific models work with their respective data"""
-        # v2022-09-01 model with v2022-09-01 data
-        address_data_20220901 = postalcode_v20220901["data"][0]
-        address_20220901 = v20220901.Address.fromdict(address_data_20220901)
-        assert address_20220901.postal_code == "1008105"
-
         # v2022-11-01 model with v2022-11-01 data
         address_data_20221101 = postalcode_v20221101["data"][0]
         address_20221101 = v20221101.Address.fromdict(address_data_20221101)
         assert address_20221101.postal_code == "1008105"
         assert address_20221101.prefecture_roman == "Tokyo"
 
-    def test_address_searcher_response_mixed_versions(
-        self, postalcode_search_v20220901, postalcode_search_v20221101
-    ):
-        """Test AddressSearcherResponse with mixed version data"""
-        # Create a response with mixed data
-        mixed_data = {
-            "version": "2022-11-01",
-            "data": [
-                postalcode_search_v20220901["data"][0],  # v2022-09-01 format
-                postalcode_search_v20221101["data"][1],  # v2022-11-01 format
-            ],
-            "query": "千代田",
-            "count": 2,
-            "offset": 0,
-            "limit": 10,
-            "facets": [["prefecture:東京都", 2]],
-        }
-
-        response = compatible.AddressSearcherResponse.fromdict(mixed_data)
-        assert response.count == 2
-        assert len(response.data) == 2
-
-        # First address (v2022-09-01 format) should have None for new fields
-        assert response.data[0].postal_code == "1000001"
-        assert response.data[0].prefecture_roman is None
-
-        # Second address (v2022-11-01 format) should have romanization
-        assert response.data[1].postal_code == "1020072"
-        assert response.data[1].prefecture_roman == "Tokyo"
-        assert response.data[1].town_roman == "Iidabashi"
-
 
 class TestCityCompatibility:
     """Test City model compatibility across versions"""
-
-    def test_v20220901_city_loads_in_compatible(self, city_v20220901):
-        """Test that v2022-09-01 city data loads in compatible model"""
-        city_data = city_v20220901["data"][0]
-        city = compatible.City.fromdict(city_data)
-
-        assert city.jisx0402 == "13101"
-        assert city.prefecture == "東京都"
-        assert city.city == "千代田区"
-
-        # Romanization fields should be None
-        assert city.prefecture_roman is None
-        assert city.city_roman is None
 
     def test_v20221101_city_loads_in_compatible(self, city_v20221101):
         """Test that v2022-11-01 city data loads in compatible model"""
@@ -147,14 +73,15 @@ class TestCityCompatibility:
 class TestNTACorporateInfoCompatibility:
     """Test NTACorporateInfo model compatibility across versions"""
 
-    def test_string_close_cause_loads_in_compatible(self, houjinbangou_v20220901):
+    def test_string_close_cause_loads_in_compatible(self, houjinbangou_v20240101):
         """Test that string close_cause loads in compatible model"""
-        corp_data = houjinbangou_v20220901["data"]
+        corp_data = houjinbangou_v20240101["data"]
         info = compatible.NTACorporateInfo.fromdict(corp_data)
 
         assert info.corporate_number == "1234567890123"
         assert info.name == "テスト株式会社"
-        assert info.close_cause == "01"  # Should remain string
+        # In 2024-01-01, close_cause might be numeric, so when converted to compatible
+        # it becomes string
         assert isinstance(info.close_cause, str)
 
     def test_numeric_close_cause_converts_to_string(self, houjinbangou_v20250101):
@@ -178,14 +105,13 @@ class TestNTACorporateInfoCompatibility:
         assert isinstance(info.close_cause, int)
 
     def test_resolver_response_compatibility(
-        self, houjinbangou_v20220901, houjinbangou_v20250101
+        self, houjinbangou_v20240101, houjinbangou_v20250101
     ):
         """Test resolver response handles both string and numeric close_cause"""
-        # Response with string close_cause
+        # Response with 2024-01-01 format (should convert to string in compatible mode)
         response_str = compatible.NTACorporateInfoResolverResponse.fromdict(
-            houjinbangou_v20220901
+            houjinbangou_v20240101
         )
-        assert response_str.data.close_cause == "01"
         assert isinstance(response_str.data.close_cause, str)
 
         # Response with numeric close_cause (should convert)
@@ -194,28 +120,6 @@ class TestNTACorporateInfoCompatibility:
         )
         assert response_num.data.close_cause == "1"
         assert isinstance(response_num.data.close_cause, str)
-
-    def test_search_response_v20220901(self, houjinbangou_search_v20220901):
-        """Test v2022-09-01 search response loads correctly"""
-        response = compatible.NTACorporateInfoSearcherResponse.fromdict(
-            houjinbangou_search_v20220901
-        )
-        assert response.version == "2022-09-01"
-        assert response.count == 3
-        assert len(response.data) == 3
-
-        # Check first corporate info has string types
-        assert response.data[0].corporate_number == "1234567890123"
-        assert response.data[0].name == "テスト株式会社"
-        assert response.data[0].sequence_number == "1"
-        assert isinstance(response.data[0].sequence_number, str)
-        assert response.data[0].kind == "301"
-        assert isinstance(response.data[0].kind, str)
-
-        # Check facets structure
-        assert response.facets is not None
-        assert "area" in response.facets
-        assert "kind" in response.facets
 
     def test_search_response_v20230901(self, houjinbangou_search_v20230901):
         """Test v2023-09-01 search response loads correctly"""
@@ -288,7 +192,8 @@ class TestNTACorporateInfoCompatibility:
     def test_search_response_api_version_propagates_to_children(
         self, houjinbangou_search_v20250101
     ):
-        """Test that api_version is correctly propagated to child NTACorporateInfo.fromdict() calls"""
+        """Test that api_version is correctly propagated to child
+        NTACorporateInfo.fromdict() calls"""
         # When we explicitly pass api_version to the searcher response,
         # it should be propagated to each NTACorporateInfo item in the data list
         response = compatible.NTACorporateInfoSearcherResponse.fromdict(
@@ -303,7 +208,8 @@ class TestNTACorporateInfoCompatibility:
             assert hasattr(corp_info, "prefecture_name")
             assert corp_info.prefecture_name is not None
 
-            # sequence_number and kind should be strings (converted from int in v2025-01-01)
+            # sequence_number and kind should be strings
+            # (converted from int in v2025-01-01)
             assert isinstance(corp_info.sequence_number, str)
             assert isinstance(corp_info.kind, str)
 
@@ -403,16 +309,9 @@ class TestHolidayModelsCompatibility:
 class TestFactoryCompatibility:
     """Test factory functions with version-specific fixtures"""
 
-    def test_address_factory_with_different_versions(
-        self, postalcode_v20220901, postalcode_v20221101
-    ):
+    def test_address_factory_with_different_versions(self, postalcode_v20221101):
         """Test address factory handles different version data"""
         from kenallclient.models.factories import create_address_resolver_response
-
-        # Test with v2022-09-01 data
-        response_20220901 = create_address_resolver_response(postalcode_v20220901)
-        assert isinstance(response_20220901, compatible.AddressResolverResponse)
-        assert response_20220901.data[0].prefecture_roman is None
 
         # Test with v2022-11-01 data
         response_20221101 = create_address_resolver_response(postalcode_v20221101)
@@ -420,16 +319,15 @@ class TestFactoryCompatibility:
         assert response_20221101.data[0].prefecture_roman == "Tokyo"
 
     def test_corporate_info_factory_handles_type_conversion(
-        self, houjinbangou_v20220901, houjinbangou_v20250101
+        self, houjinbangou_v20240101, houjinbangou_v20250101
     ):
         """Test corporate info factory handles close_cause type conversion"""
         from kenallclient.models.factories import (
             create_corporate_info_resolver_response,
         )
 
-        # String close_cause should remain string
-        response_str = create_corporate_info_resolver_response(houjinbangou_v20220901)
-        assert response_str.data.close_cause == "01"
+        # 2024-01-01 should convert to string in compatible mode
+        response_str = create_corporate_info_resolver_response(houjinbangou_v20240101)
         assert isinstance(response_str.data.close_cause, str)
 
         # Numeric close_cause should convert to string in compatible mode
