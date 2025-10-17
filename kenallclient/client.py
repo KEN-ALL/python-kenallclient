@@ -5,7 +5,6 @@ from typing import Dict, List, Literal, Optional, Tuple, overload
 
 from kenallclient.models import (
     compatible,
-    v20220901,
     v20221101,
     v20230901,
     v20240101,
@@ -58,11 +57,6 @@ class KenAllClient:
     # Address resolver with version-specific return types
     @overload
     def get(
-        self, postal_code: str, api_version: Literal["2022-09-01"] = ...
-    ) -> v20220901.AddressResolverResponse: ...
-
-    @overload
-    def get(
         self, postal_code: str, api_version: Literal["2022-11-01"] = ...
     ) -> v20221101.AddressResolverResponse: ...
 
@@ -92,18 +86,6 @@ class KenAllClient:
         return self.fetch(req, api_version)
 
     # Address search with version-specific return types
-    @overload
-    def search(
-        self,
-        *,
-        q: Optional[str],
-        t: Optional[str],
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet: Optional[str] = None,
-        api_version: Literal["2022-09-01"] = ...,
-    ) -> v20220901.AddressSearcherResponse: ...
-
     @overload
     def search(
         self,
@@ -185,21 +167,6 @@ class KenAllClient:
     # Houjin/Corporate info methods with version-specific return types
     @overload
     def get_houjin(
-        self, houjinbangou: str, api_version: Literal["2022-09-01"] = ...
-    ) -> v20220901.NTACorporateInfoResolverResponse: ...
-
-    @overload
-    def get_houjin(
-        self, houjinbangou: str, api_version: Literal["2022-11-01"] = ...
-    ) -> v20221101.NTACorporateInfoResolverResponse: ...
-
-    @overload
-    def get_houjin(
-        self, houjinbangou: str, api_version: Literal["2023-09-01"] = ...
-    ) -> v20230901.NTACorporateInfoResolverResponse: ...
-
-    @overload
-    def get_houjin(
         self, houjinbangou: str, api_version: Literal["2024-01-01"] = ...
     ) -> v20240101.NTACorporateInfoResolverResponse: ...
 
@@ -217,48 +184,6 @@ class KenAllClient:
         """Get corporate info by houjinbangou"""
         req = self.create_houjin_request(houjinbangou, api_version)
         return self.fetch_houjin_result(req, api_version)
-
-    @overload
-    def search_houjin(
-        self,
-        q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        mode: Optional[str] = None,
-        facet_area: Optional[str] = None,
-        facet_kind: Optional[str] = None,
-        facet_process: Optional[str] = None,
-        facet_close_cause: Optional[str] = None,
-        api_version: Literal["2022-09-01"] = ...,
-    ) -> v20220901.NTACorporateInfoSearcherResponse: ...
-
-    @overload
-    def search_houjin(
-        self,
-        q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        mode: Optional[str] = None,
-        facet_area: Optional[str] = None,
-        facet_kind: Optional[str] = None,
-        facet_process: Optional[str] = None,
-        facet_close_cause: Optional[str] = None,
-        api_version: Literal["2022-11-01"] = ...,
-    ) -> v20221101.NTACorporateInfoSearcherResponse: ...
-
-    @overload
-    def search_houjin(
-        self,
-        q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        mode: Optional[str] = None,
-        facet_area: Optional[str] = None,
-        facet_kind: Optional[str] = None,
-        facet_process: Optional[str] = None,
-        facet_close_cause: Optional[str] = None,
-        api_version: Literal["2023-09-01"] = ...,
-    ) -> v20230901.NTACorporateInfoSearcherResponse: ...
 
     @overload
     def search_houjin(

@@ -8,9 +8,9 @@ class DummyResponse(io.StringIO):
 
 
 # API version availability constants
-ALL_VERSIONS = ["2022-09-01", "2022-11-01", "2023-09-01", "2024-01-01", "2025-01-01"]
-POSTAL_VERSIONS = ["2022-09-01", "2022-11-01", "2023-09-01", "2024-01-01", "2025-01-01"]
-CORPORATE_VERSIONS = ["2022-09-01", "2024-01-01", "2025-01-01"]
+ALL_VERSIONS = ["2022-11-01", "2023-09-01", "2024-01-01", "2025-01-01"]
+POSTAL_VERSIONS = ["2022-11-01", "2023-09-01", "2024-01-01", "2025-01-01"]
+CORPORATE_VERSIONS = ["2024-01-01", "2025-01-01"]
 BANK_VERSIONS = ["2023-09-01", "2024-01-01", "2025-01-01"]
 INVOICE_VERSIONS = ["2024-01-01", "2025-01-01"]
 SCHOOL_VERSIONS = ["2025-01-01"]
@@ -52,12 +52,12 @@ def test_create_houjin_request():
     assert result.headers == {"Authorization": "Token testing-api-key"}
 
 
-def test_fetch(mocker, postalcode_v20220901):
+def test_fetch(mocker, postalcode_v20221101):
     import json
 
     from kenallclient.client import KenAllClient
 
-    dummy_response = DummyResponse(json.dumps(postalcode_v20220901))
+    dummy_response = DummyResponse(json.dumps(postalcode_v20221101))
     dummy_response.headers = {"Content-Type": "application/json"}
     mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
     mock_urlopen.return_value = dummy_response
@@ -69,12 +69,12 @@ def test_fetch(mocker, postalcode_v20220901):
     assert result
 
 
-def test_fetch_unexpected_content_type(mocker, postalcode_v20220901):
+def test_fetch_unexpected_content_type(mocker, postalcode_v20221101):
     import json
 
     from kenallclient.client import KenAllClient
 
-    dummy_response = DummyResponse(json.dumps(postalcode_v20220901))
+    dummy_response = DummyResponse(json.dumps(postalcode_v20221101))
     dummy_response.headers = {"Content-Type": "plain/text"}
     request_body = dummy_response.getvalue()
     mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
@@ -87,12 +87,12 @@ def test_fetch_unexpected_content_type(mocker, postalcode_v20220901):
     assert e.value.args == ("not json response", request_body)
 
 
-def test_fetch_houjin(mocker, houjinbangou_v20220901):
+def test_fetch_houjin(mocker, houjinbangou_v20240101):
     import json
 
     from kenallclient.client import KenAllClient
 
-    dummy_response = DummyResponse(json.dumps(houjinbangou_v20220901))
+    dummy_response = DummyResponse(json.dumps(houjinbangou_v20240101))
     dummy_response.headers = {"Content-Type": "application/json"}
     mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
     mock_urlopen.return_value = dummy_response
@@ -391,7 +391,7 @@ def test_bank_api_with_invalid_version(mocker):
     from kenallclient.client import KenAllClient
 
     # Mock the HTTP response to avoid actual network calls
-    dummy_response = DummyResponse(json.dumps({"version": "2022-09-01", "data": []}))
+    dummy_response = DummyResponse(json.dumps({"version": "2022-11-01", "data": []}))
     dummy_response.headers = {"Content-Type": "application/json"}
     mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
     mock_urlopen.return_value = dummy_response
@@ -400,8 +400,8 @@ def test_bank_api_with_invalid_version(mocker):
 
     # Bank APIs are only available from 2023-09-01
     with pytest.raises(ValueError) as e:
-        target.get_banks(api_version="2022-09-01")
-    assert "Bank API not available for version 2022-09-01" in str(e.value)
+        target.get_banks(api_version="2022-11-01")
+    assert "Bank API not available for version 2022-11-01" in str(e.value)
 
 
 def test_create_bank_request():

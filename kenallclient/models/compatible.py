@@ -2,17 +2,9 @@
 
 import dataclasses
 from collections.abc import Sequence
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from . import APIVersion
-from .v20220901 import Corporation, NTACorporateInfoFacetResults
-from .v20220901 import NTACorporateInfo as NTACorporateInfoBase
-from .v20220901 import (
-    NTACorporateInfoResolverResponse as NTACorporateInfoResolverResponseBase,
-)
-from .v20220901 import (
-    NTACorporateInfoSearcherResponse as NTACorporateInfoSearcherResponseBase,
-)
 from .v20230901 import (
     Bank,
     BankBranch,
@@ -48,6 +40,70 @@ __all__ = [
     "NTAQualifiedInvoiceIssuerInfo",
     "NTAQualifiedInvoiceIssuerInfoResolverResponse",
 ]
+
+
+# Base classes merged from v20220901 (used only internally for compatibility)
+@dataclasses.dataclass()
+class Corporation:
+    """Corporation model (base class for compatibility)"""
+
+    name: str
+    name_kana: str
+    block_lot: str
+    block_lot_num: Optional[str]
+    post_office: str
+    code_type: int
+
+    @classmethod
+    def fromdict(cls, d: Dict[str, Any]) -> "Corporation":
+        return cls(**d)
+
+
+@dataclasses.dataclass()
+class NTACorporateInfoFacetResults:
+    """Facet results for corporate info (base class for compatibility)"""
+
+    area: Optional[List[Tuple[str, int]]]
+    kind: Optional[List[Tuple[str, int]]]
+    process: Optional[List[Tuple[str, int]]]
+    close_cause: Optional[List[Tuple[str, int]]]
+
+    def __getitem__(self, v: Any) -> List[Tuple[str, int]]:
+        if v == "area":
+            if self.area is not None:
+                return self.area
+        elif v == "kind":
+            if self.kind is not None:
+                return self.kind
+        elif v == "process":
+            if self.process is not None:
+                return self.process
+        elif v == "close_cause":
+            if self.close_cause is not None:
+                return self.close_cause
+        raise KeyError(v)
+
+    def __contains__(self, v: Any) -> bool:
+        if v == "area":
+            return self.area is not None
+        elif v == "kind":
+            return self.kind is not None
+        elif v == "process":
+            return self.process is not None
+        elif v == "close_cause":
+            return self.close_cause is not None
+        return False
+
+    @classmethod
+    def fromdict(cls, d: Dict[str, Any]) -> "NTACorporateInfoFacetResults":
+        return cls(
+            area=[tuple(pair) for pair in d["area"]] if "area" in d else None,
+            kind=[tuple(pair) for pair in d["kind"]] if "kind" in d else None,
+            process=[tuple(pair) for pair in d["process"]] if "process" in d else None,
+            close_cause=[tuple(pair) for pair in d["close_cause"]]
+            if "close_cause" in d
+            else None,
+        )
 
 
 @dataclasses.dataclass()
@@ -210,19 +266,53 @@ class HolidaySearchResult:
 
 
 @dataclasses.dataclass()
-class NTACorporateInfo(NTACorporateInfoBase):
+class NTACorporateInfo:
     """Compatible NTACorporateInfo that ensures close_cause is always string"""
+
+    sequence_number: int
+    corporate_number: str
+    process: int
+    correct: int
+    update_date: str
+    change_date: str
+    name: str
+    name_image_id: Optional[str]
+    kind: int
+    prefecture_name: str
+    city_name: str
+    published_date: str
+    hihyoji: int
+    furigana: str
+    en_address_outside: Optional[str]
+    en_address_line: Optional[str]
+    en_prefecture_name: str
+    en_name: str
+    assignment_date: str
+    change_cause: str
+    successor_corporate_number: Optional[str]
+    close_cause: Optional[str]
+    close_date: Optional[str]
+    address_outside_image_id: Optional[str]
+    address_outside: str
+    post_code: str
+    jisx0402: str
+    address_image_id: Optional[str]
+    street_number: str
+    town: Optional[str]
+    kyoto_street: Optional[str]
+    block_lot_num: Optional[str]
+    building: Optional[str]
+    floor_room: Optional[str]
 
     @classmethod
     def fromdict(
         cls, d: Dict[str, Any], api_version: Optional[APIVersion] = None
     ) -> "NTACorporateInfo":
-        if api_version is None:
-            if "address" in d:
-                api_version = "2025-01-01"
-            else:
-                api_version = "2022-09-01"
-        if api_version >= "2024-01-01":
+        # Determine the data format based on structure, not the API version
+        # v2025-01-01+ uses nested address object, earlier versions use flat structure
+        has_nested_address = "address" in d and isinstance(d["address"], dict)
+
+        if has_nested_address:
             dd = {
                 "published_date": d["published_date"],
                 "sequence_number": str(d["sequence_number"]),
@@ -268,8 +358,11 @@ class NTACorporateInfo(NTACorporateInfoBase):
 
 
 @dataclasses.dataclass()
-class NTACorporateInfoResolverResponse(NTACorporateInfoResolverResponseBase):
+class NTACorporateInfoResolverResponse:
     """Compatible resolver response that converts numeric close_cause to string"""
+
+    version: str
+    data: NTACorporateInfo
 
     @classmethod
     def fromdict(
@@ -281,8 +374,16 @@ class NTACorporateInfoResolverResponse(NTACorporateInfoResolverResponseBase):
 
 
 @dataclasses.dataclass()
-class NTACorporateInfoSearcherResponse(NTACorporateInfoSearcherResponseBase):
+class NTACorporateInfoSearcherResponse:
     """Compatible searcher response (no conversion needed for search results)"""
+
+    version: str
+    data: List[NTACorporateInfo]
+    query: str
+    count: int
+    offset: int
+    limit: int
+    facets: NTACorporateInfoFacetResults
 
     @classmethod
     def fromdict(

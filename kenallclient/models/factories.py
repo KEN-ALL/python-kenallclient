@@ -6,7 +6,6 @@ from kenallclient.types import APIVersion
 
 from . import (
     compatible,
-    v20220901,
     v20221101,
     v20230901,
     v20240101,
@@ -17,7 +16,6 @@ from . import (
 def create_address_resolver_response(
     data: Dict[str, Any], api_version: Optional[APIVersion] = None
 ) -> Union[
-    v20220901.AddressResolverResponse,
     v20221101.AddressResolverResponse,
     v20230901.AddressResolverResponse,
     v20240101.AddressResolverResponse,
@@ -25,9 +23,7 @@ def create_address_resolver_response(
     compatible.AddressResolverResponse,
 ]:
     """Create an AddressResolverResponse instance for the specified API version"""
-    if api_version == "2022-09-01":
-        return v20220901.AddressResolverResponse.fromdict(data)
-    elif api_version == "2022-11-01":
+    if api_version == "2022-11-01":
         return v20221101.AddressResolverResponse.fromdict(data)
     elif api_version == "2023-09-01":
         return v20230901.AddressResolverResponse.fromdict(data)
@@ -42,7 +38,6 @@ def create_address_resolver_response(
 def create_address_searcher_response(
     data: Dict[str, Any], api_version: Optional[APIVersion] = None
 ) -> Union[
-    v20220901.AddressSearcherResponse,
     v20221101.AddressSearcherResponse,
     v20230901.AddressSearcherResponse,
     v20240101.AddressSearcherResponse,
@@ -50,9 +45,7 @@ def create_address_searcher_response(
     compatible.AddressSearcherResponse,
 ]:
     """Create an AddressSearcherResponse instance for the specified API version"""
-    if api_version == "2022-09-01":
-        return v20220901.AddressSearcherResponse.fromdict(data)
-    elif api_version == "2022-11-01":
+    if api_version == "2022-11-01":
         return v20221101.AddressSearcherResponse.fromdict(data)
     elif api_version == "2023-09-01":
         return v20230901.AddressSearcherResponse.fromdict(data)
@@ -67,7 +60,6 @@ def create_address_searcher_response(
 def create_city_resolver_response(
     data: Dict[str, Any], api_version: Optional[APIVersion] = None
 ) -> Union[
-    v20220901.CityResolverResponse,
     v20221101.CityResolverResponse,
     v20230901.CityResolverResponse,
     v20240101.CityResolverResponse,
@@ -75,9 +67,7 @@ def create_city_resolver_response(
     compatible.CityResolverResponse,
 ]:
     """Create a CityResolverResponse instance for the specified API version"""
-    if api_version == "2022-09-01":
-        return v20220901.CityResolverResponse.fromdict(data)
-    elif api_version == "2022-11-01":
+    if api_version == "2022-11-01":
         return v20221101.CityResolverResponse.fromdict(data)
     elif api_version == "2023-09-01":
         return v20230901.CityResolverResponse.fromdict(data)
@@ -92,20 +82,15 @@ def create_city_resolver_response(
 def create_corporate_info_resolver_response(
     data: Dict[str, Any], api_version: Optional[APIVersion] = None
 ) -> Union[
-    v20220901.NTACorporateInfoResolverResponse,
-    v20221101.NTACorporateInfoResolverResponse,
-    v20230901.NTACorporateInfoResolverResponse,
     v20240101.NTACorporateInfoResolverResponse,
     v20250101.NTACorporateInfoResolverResponse,
     compatible.NTACorporateInfoResolverResponse,
 ]:
     """Create a NTACorporateInfoResolverResponse for the specified API version"""
-    if api_version == "2022-09-01":
-        return v20220901.NTACorporateInfoResolverResponse.fromdict(data)
-    elif api_version == "2022-11-01":
-        return v20221101.NTACorporateInfoResolverResponse.fromdict(data)
+    if api_version == "2022-11-01":
+        return v20240101.NTACorporateInfoResolverResponse.fromdict(data)
     elif api_version == "2023-09-01":
-        return v20230901.NTACorporateInfoResolverResponse.fromdict(data)
+        return v20240101.NTACorporateInfoResolverResponse.fromdict(data)
     elif api_version == "2024-01-01":
         return v20240101.NTACorporateInfoResolverResponse.fromdict(data)
     elif api_version == "2025-01-01":
@@ -118,20 +103,15 @@ def create_corporate_info_resolver_response(
 def create_corporate_info_searcher_response(
     data: Dict[str, Any], api_version: Optional[APIVersion] = None
 ) -> Union[
-    v20220901.NTACorporateInfoSearcherResponse,
-    v20221101.NTACorporateInfoSearcherResponse,
-    v20230901.NTACorporateInfoSearcherResponse,
     v20240101.NTACorporateInfoSearcherResponse,
     v20250101.NTACorporateInfoSearcherResponse,
     compatible.NTACorporateInfoSearcherResponse,
 ]:
     """Create a NTACorporateInfoSearcherResponse for the specified API version"""
-    if api_version == "2022-09-01":
-        return v20220901.NTACorporateInfoSearcherResponse.fromdict(data)
-    elif api_version == "2022-11-01":
-        return v20221101.NTACorporateInfoSearcherResponse.fromdict(data)
+    if api_version == "2022-11-01":
+        return v20240101.NTACorporateInfoSearcherResponse.fromdict(data)
     elif api_version == "2023-09-01":
-        return v20230901.NTACorporateInfoSearcherResponse.fromdict(data)
+        return v20240101.NTACorporateInfoSearcherResponse.fromdict(data)
     elif api_version == "2024-01-01":
         return v20240101.NTACorporateInfoSearcherResponse.fromdict(data)
     elif api_version == "2025-01-01":

@@ -22,8 +22,8 @@ def load_version_fixture():
 
 # Default versions for backward compatibility
 # These map old fixtures to specific API versions
-DEFAULT_POSTALCODE_VERSION = "2022-09-01"
-DEFAULT_HOUJINBANGOU_VERSION = "2022-09-01"
+DEFAULT_POSTALCODE_VERSION = "2022-11-01"
+DEFAULT_HOUJINBANGOU_VERSION = "2024-01-01"
 DEFAULT_BANK_VERSION = "2023-09-01"
 
 
@@ -87,18 +87,8 @@ def dummy_bank_branch_json():
 
 # Version-specific fixtures
 @pytest.fixture
-def postalcode_v20220901(load_version_fixture):
-    return load_version_fixture("2022-09-01", "postalcode_get.json")
-
-
-@pytest.fixture
 def postalcode_v20221101(load_version_fixture):
     return load_version_fixture("2022-11-01", "postalcode_get.json")
-
-
-@pytest.fixture
-def postalcode_search_v20220901(load_version_fixture):
-    return load_version_fixture("2022-09-01", "postalcode_search.json")
 
 
 @pytest.fixture
@@ -107,18 +97,13 @@ def postalcode_search_v20221101(load_version_fixture):
 
 
 @pytest.fixture
-def city_v20220901(load_version_fixture):
-    return load_version_fixture("2022-09-01", "city_get.json")
-
-
-@pytest.fixture
 def city_v20221101(load_version_fixture):
     return load_version_fixture("2022-11-01", "city_get.json")
 
 
 @pytest.fixture
-def houjinbangou_v20220901(load_version_fixture):
-    return load_version_fixture("2022-09-01", "houjinbangou.json")
+def houjinbangou_v20240101(load_version_fixture):
+    return load_version_fixture("2024-01-01", "houjinbangou.json")
 
 
 @pytest.fixture
@@ -152,9 +137,6 @@ def invoice_issuer_v20240101(load_version_fixture):
 
 
 # Corporate info search fixtures
-@pytest.fixture
-def houjinbangou_search_v20220901(load_version_fixture):
-    return load_version_fixture("2022-09-01", "houjinbangou_search.json")
 
 
 @pytest.fixture

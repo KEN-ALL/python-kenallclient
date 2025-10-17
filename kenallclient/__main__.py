@@ -201,7 +201,7 @@ def make_parser() -> argparse.ArgumentParser:
     parser.add_argument("--apiurl", default=os.environ.get("KENALL_API_URL"))
     parser.add_argument(
         "--api-version",
-        choices=["2022-09-01", "2022-11-01", "2023-09-01", "2024-01-01", "2025-01-01"],
+        choices=["2022-11-01", "2023-09-01", "2024-01-01", "2025-01-01"],
         help="API version to use",
     )
     subparsers = parser.add_subparsers(dest="command")
