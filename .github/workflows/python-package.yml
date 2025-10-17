@@ -3,15 +3,15 @@ name: python package
 on:
   push:
     tags:
-      - '*'
+      - "v*"
 jobs:
   pack:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
+      - uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c  # v6
         with:
-          python-version: "3.9"
+          python-version: "3.11"
       - name: install nox
         run: pip install nox
       - name: run nox
@@ -23,7 +23,7 @@ jobs:
           path: |
             dist
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090  # v2
         with:
           files: |
             dist/kenallclient-*.whl
