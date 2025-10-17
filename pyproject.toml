@@ -29,6 +29,7 @@ dev = [
 release = [
     "nox",
     "build",
+    "twine",
 ]
 
 [project.urls]
