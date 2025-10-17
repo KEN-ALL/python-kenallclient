@@ -290,7 +290,7 @@ class NTACorporateInfoSearcherResponse(NTACorporateInfoSearcherResponseBase):
     ) -> "NTACorporateInfoSearcherResponse":
         dd = dict(d)
         dd["facets"] = NTACorporateInfoFacetResults.fromdict(dd.get("facets", {}))
-        dd["data"] = [NTACorporateInfo.fromdict(i) for i in dd["data"]]
+        dd["data"] = [NTACorporateInfo.fromdict(i, api_version) for i in dd["data"]]
         return cls(**dd)
 
 
