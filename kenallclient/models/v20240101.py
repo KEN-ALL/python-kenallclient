@@ -117,15 +117,16 @@ class AddressSearcherResponse:
     count: int
     offset: Optional[int]
     limit: Optional[int]
-    facets: Optional[List[List[Any]]]
+    facets: Optional[List[Tuple[str, int]]]
 
     @classmethod
     def fromdict(cls, d: Dict[str, Any]) -> "AddressSearcherResponse":
         data = [Address.fromdict(i) for i in d["data"]]
         dd = dict(d)
         dd["data"] = data
-        if dd.get("facets") is not None:
-            dd["facets"] = [list(f) for f in dd["facets"]]
+        dd["facets"] = [
+            tuple(pair) for pair in (dd.get("facets") or {}).get("area", [])
+        ]
         return cls(**dd)
 
 
@@ -300,7 +301,7 @@ class NTACorporateInfoSearcherResponse:
     def fromdict(cls, d: Dict[str, Any]) -> "NTACorporateInfoSearcherResponse":
         dd = dict(d)
         dd["data"] = [NTACorporateInfo.fromdict(i) for i in dd["data"]]
-        dd["facets"] = NTACorporateInfoFacetResults.fromdict(dd.get("facets", {}))
+        dd["facets"] = NTACorporateInfoFacetResults.fromdict(dd.get("facets") or {})
         return cls(**dd)
 
 

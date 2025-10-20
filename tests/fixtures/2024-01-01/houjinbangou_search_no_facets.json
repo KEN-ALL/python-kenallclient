@@ -1,0 +1,52 @@
+{
+  "version": "2024-01-01",
+  "data": [
+    {
+      "sequence_number": 1,
+      "corporate_number": "1234567890123",
+      "process": 1,
+      "correct": 0,
+      "update_date": "2024-01-01",
+      "change_date": "2024-01-01",
+      "name": "テスト株式会社",
+      "name_image_id": null,
+      "kind": 301,
+      "published_date": "2024-01-01",
+      "hihyoji": 0,
+      "furigana": "テストカブシキガイシャ",
+      "en_address_outside": null,
+      "en_address_line": "1-1-1 Akasaka, Minato-ku",
+      "en_name": "Test Corporation",
+      "assignment_date": "2024-01-01",
+      "change_cause": "",
+      "successor_corporate_number": null,
+      "close_cause": null,
+      "close_date": null,
+      "address_outside_image_id": null,
+      "address_outside": "",
+      "qualified_invoice_issuer_number": null,
+      "address_image_id": null,
+      "address": {
+        "postal_code": "1070052",
+        "jisx0402": "13103",
+        "prefecture": "東京都",
+        "prefecture_kana": "トウキョウト",
+        "prefecture_roman": "Tokyo",
+        "city": "港区",
+        "city_kana": "ミナトク",
+        "city_roman": "Minato-ku",
+        "street_number": "赤坂１丁目１番１号",
+        "town": "赤坂",
+        "kyoto_street": null,
+        "block_lot_num": "1-1-1",
+        "building": null,
+        "floor_room": null
+      }
+    }
+  ],
+  "query": "name:テスト",
+  "count": 1,
+  "offset": 0,
+  "limit": 100,
+  "facets": null
+}
