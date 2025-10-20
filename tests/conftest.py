@@ -162,3 +162,34 @@ def school_v20250101(load_version_fixture):
 @pytest.fixture
 def school_search_v20250101(load_version_fixture):
     return load_version_fixture("2025-01-01", "school_search.json")
+
+
+# Additional fixtures for facets testing
+@pytest.fixture
+def postalcode_search_multiple_facets_v20230901(load_version_fixture):
+    return load_version_fixture("2023-09-01", "postalcode_search_multiple_facets.json")
+
+
+@pytest.fixture
+def postalcode_search_no_facets_v20230901(load_version_fixture):
+    return load_version_fixture("2023-09-01", "postalcode_search_no_facets.json")
+
+
+@pytest.fixture
+def houjinbangou_search_no_facets_v20240101(load_version_fixture):
+    return load_version_fixture("2024-01-01", "houjinbangou_search_no_facets.json")
+
+
+@pytest.fixture
+def houjinbangou_search_empty_facets_v20240101(load_version_fixture):
+    return load_version_fixture("2024-01-01", "houjinbangou_search_empty_facets.json")
+
+
+@pytest.fixture
+def houjinbangou_search_no_facets_v20250101(load_version_fixture):
+    return load_version_fixture("2025-01-01", "houjinbangou_search_no_facets.json")
+
+
+@pytest.fixture
+def houjinbangou_search_empty_facets_v20250101(load_version_fixture):
+    return load_version_fixture("2025-01-01", "houjinbangou_search_empty_facets.json")

@@ -1,3 +1,5 @@
+import pytest
+
 from kenallclient import model
 
 
@@ -10,7 +12,7 @@ class TestKenAllSearchResult:
             count=2,
             offset=0,
             limit=10,
-            facets={"area": ["/東京都/千代田区", 2]},
+            facets=[("/東京都/千代田区", 2)],
             data=[
                 model.KenAllResultItem(
                     jisx0402="13101",
@@ -88,6 +90,32 @@ class TestKenAllSearchResult:
                 ),
             ],
         )
+
+    def test_fromdict_multiple_facets(self, load_version_fixture):
+        """Test AddressSearcherResponse with multiple facet values"""
+        fixture = load_version_fixture(
+            "2023-09-01", "postalcode_search_multiple_facets.json"
+        )
+        result = model.KenAllSearchResult.fromdict(fixture)
+
+        assert result.version == "2023-09-01"
+        assert result.count == 3
+        assert result.facets == [
+            ("/東京都/千代田区", 1),
+            ("/東京都/中央区", 1),
+            ("/大阪府/大阪市北区", 1),
+        ]
+        assert len(result.data) == 3
+
+    def test_fromdict_no_facets(self, load_version_fixture):
+        """Test AddressSearcherResponse with null facets"""
+        fixture = load_version_fixture("2023-09-01", "postalcode_search_no_facets.json")
+        result = model.KenAllSearchResult.fromdict(fixture)
+
+        assert result.version == "2023-09-01"
+        assert result.count == 1
+        assert result.facets == []
+        assert len(result.data) == 1
 
 
 class TestKenAllResult:
@@ -247,3 +275,71 @@ class TestHolidaySearchResult:
                 ),
             ]
         )
+
+
+class TestHoujinSearchResult:
+    def test_fromdict_with_facets(self, houjinbangou_search_v20240101):
+        """Test NTACorporateInfoSearcherResponse with all facet types"""
+        result = model.HoujinSearchResult.fromdict(houjinbangou_search_v20240101)
+
+        assert result.version == "2024-01-01"
+        assert result.count == 3
+        assert result.offset == 0
+        assert result.limit == 100
+
+        # Check facets structure
+        assert result.facets is not None
+        assert "area" in result.facets
+        assert "kind" in result.facets
+        assert "process" in result.facets
+        assert "close_cause" in result.facets
+
+        # Check area facets
+        assert result.facets["area"] == [("/東京都", 2), ("/大阪府", 1)]
+
+        # Check kind facets
+        assert result.facets["kind"] == [("/株式会社", 2), ("/有限会社", 1)]
+
+        # Check process facets
+        assert result.facets["process"] == [("/新規", 2), ("/国内所在地の変更", 1)]
+
+        # Check close_cause facets
+        assert result.facets["close_cause"] == [("/合併による解散等", 1)]
+
+    def test_fromdict_no_facets(self, load_version_fixture):
+        """Test NTACorporateInfoSearcherResponse with null facets"""
+        fixture = load_version_fixture(
+            "2024-01-01", "houjinbangou_search_no_facets.json"
+        )
+        result = model.HoujinSearchResult.fromdict(fixture)
+
+        assert result.version == "2024-01-01"
+        assert result.count == 1
+        assert result.facets is not None
+        assert result.facets.area is None
+        assert result.facets.kind is None
+        assert result.facets.process is None
+        assert result.facets.close_cause is None
+
+    def test_fromdict_empty_facets(self, load_version_fixture):
+        """Test NTACorporateInfoSearcherResponse with empty facets object"""
+        fixture = load_version_fixture(
+            "2024-01-01", "houjinbangou_search_empty_facets.json"
+        )
+        result = model.HoujinSearchResult.fromdict(fixture)
+
+        assert result.version == "2024-01-01"
+        assert result.count == 1
+        assert result.facets is not None
+        assert result.facets.area is None
+        assert result.facets.kind is None
+        assert result.facets.process is None
+        assert result.facets.close_cause is None
+
+        # Test __contains__ method
+        assert "area" not in result.facets
+        assert "kind" not in result.facets
+
+        # Test __getitem__ raises KeyError for missing facets
+        with pytest.raises(KeyError):
+            _ = result.facets["area"]
