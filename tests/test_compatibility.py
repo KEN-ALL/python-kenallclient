@@ -341,3 +341,91 @@ class TestFactoryCompatibility:
         )
         assert response_v2025.data.close_cause == 1
         assert isinstance(response_v2025.data.close_cause, int)
+
+
+class TestWhoamiAndBusinessDayModels:
+    """Test the models of the APIs that are not versioned"""
+
+    def test_whoami_response(self, dummy_whoami_json):
+        from kenallclient.models import compatible
+
+        response = compatible.WhoamiResponse.fromdict(dummy_whoami_json)
+        assert response.remote_addr.type == "v4"
+        assert response.remote_addr.address == "192.0.2.1"
+
+    def test_business_day_check_response(self, dummy_businessday_check_json):
+        from kenallclient.models import compatible
+
+        response = compatible.BusinessDayCheckResponse.fromdict(
+            dummy_businessday_check_json
+        )
+        assert response.result is True
+
+
+class TestV20260801Models:
+    """The 2026-08-01 payloads are identical to the 2025-01-01 ones"""
+
+    def test_models_are_reexported_from_v20250101(self):
+        from kenallclient.models import v20250101, v20260801
+
+        for name in v20260801.__all__:
+            assert getattr(v20260801, name) is getattr(v20250101, name), name
+
+    def test_bank_factories_accept_the_new_version(self, load_version_fixture):
+        from kenallclient.models import v20260801
+        from kenallclient.models.factories import (
+            create_bank_branches_response,
+            create_banks_response,
+        )
+
+        banks = create_banks_response(
+            load_version_fixture("2026-08-01", "banks_search.json"),
+            api_version="2026-08-01",
+        )
+        assert isinstance(banks, v20260801.BanksResponse)
+        assert banks.version == "2026-08-01"
+
+        branches = create_bank_branches_response(
+            load_version_fixture("2026-08-01", "bank_branches_search.json"),
+            api_version="2026-08-01",
+        )
+        assert isinstance(branches, v20260801.BankBranchesResponse)
+        assert branches.data.branches["026"][0].name == "横浜支店"
+
+
+class TestVersionPinnedBankResponses:
+    """A pinned api_version yields that version's payload shape, unflattened"""
+
+    def test_branches_are_single_objects_before_20250101(self, load_version_fixture):
+        from kenallclient.models import v20230901
+        from kenallclient.models.factories import create_bank_branches_response
+
+        response = create_bank_branches_response(
+            load_version_fixture("2023-09-01", "bank_branches_get.json"),
+            api_version="2023-09-01",
+        )
+        assert isinstance(response, v20230901.BankBranchesResponse)
+        assert response.data.bank.code == "0001"
+        assert response.data.branches["001"].name == "東京営業部"
+
+    def test_branches_are_arrays_from_20250101(self, load_version_fixture):
+        from kenallclient.models import v20250101
+        from kenallclient.models.factories import create_bank_branches_response
+
+        response = create_bank_branches_response(
+            load_version_fixture("2025-01-01", "bank_branches_get.json"),
+            api_version="2025-01-01",
+        )
+        assert isinstance(response, v20250101.BankBranchesResponse)
+        assert response.data.branches["001"][0].name == "東京営業部"
+
+    def test_compatible_mode_still_flattens(self, load_version_fixture):
+        from kenallclient.models import compatible
+        from kenallclient.models.factories import create_bank_branches_response
+
+        response = create_bank_branches_response(
+            load_version_fixture("2023-09-01", "bank_branches_get.json")
+        )
+        assert isinstance(response, compatible.BankBranchesResponse)
+        # The compatible model normalizes a single branch into a one-item list
+        assert response.data["001"][0].name == "東京営業部"

@@ -34,9 +34,14 @@ def command(name: str) -> Callable[[Type[Command]], Type[Command]]:
 class GetCommand(Command):
     def add_subparser(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("postalcode")
+        parser.add_argument("--version", help="database version to query against")
 
     def execute(self, client: KenAllClient, args: argparse.Namespace) -> None:
-        pprint(client.get(args.postalcode, api_version=args.api_version))
+        pprint(
+            client.get(
+                args.postalcode, api_version=args.api_version, version=args.version
+            )
+        )
 
 
 @command("search")
@@ -47,6 +52,7 @@ class SearchCommand(Command):
         parser.add_argument("--offset", type=int)
         parser.add_argument("--limit", type=int)
         parser.add_argument("--facet")
+        parser.add_argument("--version", help="database version to query against")
 
     def execute(self, client: KenAllClient, args: argparse.Namespace) -> None:
         pprint(
@@ -56,6 +62,24 @@ class SearchCommand(Command):
                 offset=args.offset,
                 limit=args.limit,
                 facet=args.facet,
+                version=args.version,
+                api_version=args.api_version,
+            )
+        )
+
+
+@command("get-cities")
+class GetCitiesCommand(Command):
+    def add_subparser(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("prefecture_code")
+        parser.add_argument("--version", help="database version to query against")
+
+    def execute(self, client: KenAllClient, args: argparse.Namespace) -> None:
+        pprint(
+            client.get_cities(
+                args.prefecture_code,
+                api_version=args.api_version,
+                version=args.version,
             )
         )
 
@@ -97,6 +121,17 @@ class SearchHoujinCommand(Command):
         )
 
 
+@command("get-invoice-issuer")
+class GetInvoiceIssuerCommand(Command):
+    def add_subparser(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("issuer_number")
+
+    def execute(self, client: KenAllClient, args: argparse.Namespace) -> None:
+        pprint(
+            client.get_invoice_issuer(args.issuer_number, api_version=args.api_version)
+        )
+
+
 @command("search-holiday")
 class SearchHolidayCommand(Command):
     def add_subparser(self, parser: argparse.ArgumentParser) -> None:
@@ -115,6 +150,24 @@ class SearchHolidayCommand(Command):
         )
 
 
+@command("check-business-day")
+class CheckBusinessDayCommand(Command):
+    def add_subparser(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("date", help="the date to check, in YYYY-MM-DD form")
+
+    def execute(self, client: KenAllClient, args: argparse.Namespace) -> None:
+        pprint(client.check_business_day(args.date, api_version=args.api_version))
+
+
+@command("whoami")
+class WhoamiCommand(Command):
+    def add_subparser(self, parser: argparse.ArgumentParser) -> None:
+        pass
+
+    def execute(self, client: KenAllClient, args: argparse.Namespace) -> None:
+        pprint(client.whoami(api_version=args.api_version))
+
+
 @command("get-banks")
 class GetBanksCommand(Command):
     def add_subparser(self, parser: argparse.ArgumentParser) -> None:
@@ -122,6 +175,29 @@ class GetBanksCommand(Command):
 
     def execute(self, client: KenAllClient, args: argparse.Namespace) -> None:
         pprint(client.get_banks(api_version=args.api_version))
+
+
+@command("search-banks")
+class SearchBanksCommand(Command):
+    def add_subparser(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("--query", "-q", help="bank name or kana reading")
+        parser.add_argument("--match", choices=["prefix", "contains"])
+        parser.add_argument(
+            "--type",
+            choices=["bank", "shinkin", "shinkumi_rokin", "nokyo_gyokyo", "yucho"],
+        )
+        parser.add_argument("--version", help="database version to query against")
+
+    def execute(self, client: KenAllClient, args: argparse.Namespace) -> None:
+        pprint(
+            client.search_banks(
+                q=args.query,
+                match=args.match,
+                type=args.type,
+                version=args.version,
+                api_version=args.api_version,
+            )
+        )
 
 
 @command("get-bank")
@@ -140,6 +216,26 @@ class GetBankBranchesCommand(Command):
 
     def execute(self, client: KenAllClient, args: argparse.Namespace) -> None:
         pprint(client.get_bank_branches(args.bank_code, api_version=args.api_version))
+
+
+@command("search-bank-branches")
+class SearchBankBranchesCommand(Command):
+    def add_subparser(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument("bank_code")
+        parser.add_argument("--query", "-q", help="branch name or kana reading")
+        parser.add_argument("--match", choices=["prefix", "contains"])
+        parser.add_argument("--version", help="database version to query against")
+
+    def execute(self, client: KenAllClient, args: argparse.Namespace) -> None:
+        pprint(
+            client.search_bank_branches(
+                args.bank_code,
+                q=args.query,
+                match=args.match,
+                version=args.version,
+                api_version=args.api_version,
+            )
+        )
 
 
 @command("get-bank-branch")
@@ -201,7 +297,7 @@ def make_parser() -> argparse.ArgumentParser:
     parser.add_argument("--apiurl", default=os.environ.get("KENALL_API_URL"))
     parser.add_argument(
         "--api-version",
-        choices=["2022-11-01", "2023-09-01", "2024-01-01", "2025-01-01"],
+        choices=["2022-11-01", "2023-09-01", "2024-01-01", "2025-01-01", "2026-08-01"],
         help="API version to use",
     )
     subparsers = parser.add_subparsers(dest="command")

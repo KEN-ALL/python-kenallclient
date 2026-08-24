@@ -27,6 +27,7 @@ __all__ = [
     "BankBranchResolverResponse",
     "BankResolverResponse",
     "BanksResponse",
+    "BusinessDayCheckResponse",
     "City",
     "CityResolverResponse",
     "Corporation",
@@ -39,6 +40,8 @@ __all__ = [
     "NTAEntityAddress",
     "NTAQualifiedInvoiceIssuerInfo",
     "NTAQualifiedInvoiceIssuerInfoResolverResponse",
+    "RemoteAddress",
+    "WhoamiResponse",
 ]
 
 
@@ -263,6 +266,42 @@ class HolidaySearchResult:
     def fromdict(cls, d: Dict[str, Any]) -> "HolidaySearchResult":
         data = [Holiday.fromdict(i) for i in d["data"]]
         return HolidaySearchResult(data=data)
+
+
+@dataclasses.dataclass()
+class BusinessDayCheckResponse:
+    """Business day check result (the API is not versioned)"""
+
+    result: bool
+
+    @classmethod
+    def fromdict(cls, d: Dict[str, Any]) -> "BusinessDayCheckResponse":
+        return cls(result=d["result"])
+
+
+@dataclasses.dataclass()
+class RemoteAddress:
+    """The IP address a request originated from, as observed by the API server"""
+
+    #: ``"v4"`` for an IPv4 address, ``"v6"`` for an IPv6 address
+    type: str
+    #: The IP address in its textual representation
+    address: str
+
+    @classmethod
+    def fromdict(cls, d: Dict[str, Any]) -> "RemoteAddress":
+        return cls(**d)
+
+
+@dataclasses.dataclass()
+class WhoamiResponse:
+    """Whoami result (the API is not versioned)"""
+
+    remote_addr: RemoteAddress
+
+    @classmethod
+    def fromdict(cls, d: Dict[str, Any]) -> "WhoamiResponse":
+        return cls(remote_addr=RemoteAddress.fromdict(d["remote_addr"]))
 
 
 @dataclasses.dataclass()
