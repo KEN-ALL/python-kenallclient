@@ -1,7 +1,7 @@
 """Models for API version 2023-09-01"""
 
 import dataclasses
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 __all__ = [
     "Corporation",
@@ -29,12 +29,12 @@ class Corporation:
     name: str
     name_kana: str
     block_lot: str
-    block_lot_num: Optional[str]
+    block_lot_num: str | None
     post_office: str
     code_type: int
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "Corporation":
+    def fromdict(cls, d: dict[str, Any]) -> "Corporation":
         return cls(**d)
 
 
@@ -61,7 +61,7 @@ class Address:
     town_chome: bool
     town_multi: bool
     town_raw: str
-    corporation: Optional[Corporation]
+    corporation: Corporation | None
     # New fields in v2022-11-01
     prefecture_roman: str
     city_roman: str
@@ -80,7 +80,7 @@ class Address:
     update_reason: int
 
     @classmethod
-    def fromdict(cls, i: Dict[str, Any]) -> "Address":
+    def fromdict(cls, i: dict[str, Any]) -> "Address":
         if i.get("corporation"):
             i = dict(i)
             i["corporation"] = Corporation.fromdict(i["corporation"])
@@ -92,10 +92,10 @@ class AddressResolverResponse:
     """Address resolver response for v2022-11-01"""
 
     version: str
-    data: List[Address]
+    data: list[Address]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "AddressResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "AddressResolverResponse":
         data = [Address.fromdict(i) for i in d["data"]]
         return cls(version=d["version"], data=data)
 
@@ -105,15 +105,15 @@ class AddressSearcherResponse:
     """Address searcher response for v2022-11-01"""
 
     version: str
-    data: List[Address]
+    data: list[Address]
     query: str
     count: int
-    offset: Optional[int]
-    limit: Optional[int]
-    facets: Optional[List[Tuple[str, int]]]
+    offset: int | None
+    limit: int | None
+    facets: list[tuple[str, int]] | None
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "AddressSearcherResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "AddressSearcherResponse":
         data = [Address.fromdict(i) for i in d["data"]]
         dd = dict(d)
         dd["data"] = data
@@ -144,7 +144,7 @@ class City:
     city_without_county_and_ward_roman: str
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "City":
+    def fromdict(cls, d: dict[str, Any]) -> "City":
         return cls(**d)
 
 
@@ -153,10 +153,10 @@ class CityResolverResponse:
     """City resolver response for v2022-11-01"""
 
     version: str
-    data: List[City]
+    data: list[City]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "CityResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "CityResolverResponse":
         data = [City.fromdict(i) for i in d["data"]]
         return cls(version=d["version"], data=data)
 
@@ -173,7 +173,7 @@ class Bank:
     romaji: str
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "Bank":
+    def fromdict(cls, d: dict[str, Any]) -> "Bank":
         return cls(**d)
 
 
@@ -188,7 +188,7 @@ class BankBranch:
     romaji: str
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BankBranch":
+    def fromdict(cls, d: dict[str, Any]) -> "BankBranch":
         return cls(**d)
 
 
@@ -197,10 +197,10 @@ class BanksResponse:
     """Banks response for v2023-09-01"""
 
     version: str
-    data: List[Bank]
+    data: list[Bank]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BanksResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "BanksResponse":
         data = [Bank.fromdict(i) for i in d["data"]]
         return cls(version=d["version"], data=data)
 
@@ -213,7 +213,7 @@ class BankResolverResponse:
     data: Bank
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BankResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "BankResolverResponse":
         return cls(version=d["version"], data=Bank.fromdict(d["data"]))
 
 
@@ -222,10 +222,10 @@ class BankBranchesData:
     """Nested data structure for bank branches response in v2023-09-01"""
 
     bank: Bank
-    branches: Dict[str, BankBranch]
+    branches: dict[str, BankBranch]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BankBranchesData":
+    def fromdict(cls, d: dict[str, Any]) -> "BankBranchesData":
         bank = Bank.fromdict(d["bank"])
         branches = {
             code: BankBranch.fromdict(branch) for code, branch in d["branches"].items()
@@ -241,7 +241,7 @@ class BankBranchesResponse:
     data: BankBranchesData
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BankBranchesResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "BankBranchesResponse":
         data = BankBranchesData.fromdict(d["data"])
         return cls(version=d["version"], data=data)
 
@@ -254,7 +254,7 @@ class BankBranchData:
     branch: BankBranch
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BankBranchData":
+    def fromdict(cls, d: dict[str, Any]) -> "BankBranchData":
         bank = Bank.fromdict(d["bank"])
         branch = BankBranch.fromdict(d["branch"])
         return cls(bank=bank, branch=branch)
@@ -268,6 +268,6 @@ class BankBranchResolverResponse:
     data: BankBranchData
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BankBranchResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "BankBranchResolverResponse":
         data = BankBranchData.fromdict(d["data"])
         return cls(version=d["version"], data=data)

@@ -4,7 +4,6 @@ import sys
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable
 from pprint import pprint
-from typing import Dict, Type
 
 from .client import KenAllClient
 
@@ -19,11 +18,11 @@ class Command(metaclass=ABCMeta):
         pass
 
 
-commands: Dict[str, Command] = {}
+commands: dict[str, Command] = {}
 
 
-def command(name: str) -> Callable[[Type[Command]], Type[Command]]:
-    def _(typ: Type[Command]) -> Type[Command]:
+def command(name: str) -> Callable[[type[Command]], type[Command]]:
+    def _(typ: type[Command]) -> type[Command]:
         commands[name] = typ()
         return typ
 

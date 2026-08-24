@@ -2,7 +2,7 @@ import json
 import re
 import urllib.parse
 import urllib.request
-from typing import Dict, List, Literal, Optional, Tuple, overload
+from typing import Literal, overload
 
 from kenallclient.models import (
     compatible,
@@ -51,25 +51,23 @@ def normalize_postal_code(postal_code: str) -> str:
 
 class KenAllClient:
     api_url = "https://api.kenall.jp"
-    api_version: Optional[APIVersion] = None
+    api_version: APIVersion | None = None
 
     def __init__(
         self,
         api_key: str,
-        api_url: Optional[str] = None,
+        api_url: str | None = None,
     ) -> None:
         self.api_key = api_key
         if api_url is not None:
             self.api_url = api_url
 
     @property
-    def authorization(self) -> Dict[str, str]:
+    def authorization(self) -> dict[str, str]:
         auth = {"Authorization": f"Token {self.api_key}"}
         return auth
 
-    def _build_headers(
-        self, api_version: Optional[APIVersion] = None
-    ) -> Dict[str, str]:
+    def _build_headers(self, api_version: APIVersion | None = None) -> dict[str, str]:
         headers = self.authorization.copy()
         version = api_version or self.api_version
         if version:
@@ -83,7 +81,7 @@ class KenAllClient:
         postal_code: str,
         api_version: Literal["2022-11-01"] = ...,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> v20221101.AddressResolverResponse: ...
 
     @overload
@@ -92,7 +90,7 @@ class KenAllClient:
         postal_code: str,
         api_version: Literal["2023-09-01"] = ...,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> v20230901.AddressResolverResponse: ...
 
     @overload
@@ -101,7 +99,7 @@ class KenAllClient:
         postal_code: str,
         api_version: Literal["2024-01-01"] = ...,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> v20240101.AddressResolverResponse: ...
 
     @overload
@@ -110,7 +108,7 @@ class KenAllClient:
         postal_code: str,
         api_version: Literal["2025-01-01"] = ...,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> v20250101.AddressResolverResponse: ...
 
     @overload
@@ -119,7 +117,7 @@ class KenAllClient:
         postal_code: str,
         api_version: Literal["2026-08-01"] = ...,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> v20260801.AddressResolverResponse: ...
 
     @overload
@@ -128,15 +126,15 @@ class KenAllClient:
         postal_code: str,
         api_version: None = None,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> compatible.AddressResolverResponse: ...
 
     def get(
         self,
         postal_code: str,
-        api_version: Optional[APIVersion] = None,
+        api_version: APIVersion | None = None,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ):
         """Get address information by postal code
 
@@ -151,12 +149,12 @@ class KenAllClient:
     def search(
         self,
         *,
-        q: Optional[str] = None,
-        t: Optional[str] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet: Optional[str] = None,
-        version: Optional[str] = None,
+        q: str | None = None,
+        t: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet: str | None = None,
+        version: str | None = None,
         api_version: Literal["2022-11-01"] = ...,
     ) -> v20221101.AddressSearcherResponse: ...
 
@@ -164,12 +162,12 @@ class KenAllClient:
     def search(
         self,
         *,
-        q: Optional[str] = None,
-        t: Optional[str] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet: Optional[str] = None,
-        version: Optional[str] = None,
+        q: str | None = None,
+        t: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet: str | None = None,
+        version: str | None = None,
         api_version: Literal["2023-09-01"] = ...,
     ) -> v20230901.AddressSearcherResponse: ...
 
@@ -177,12 +175,12 @@ class KenAllClient:
     def search(
         self,
         *,
-        q: Optional[str] = None,
-        t: Optional[str] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet: Optional[str] = None,
-        version: Optional[str] = None,
+        q: str | None = None,
+        t: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet: str | None = None,
+        version: str | None = None,
         api_version: Literal["2024-01-01"] = ...,
     ) -> v20240101.AddressSearcherResponse: ...
 
@@ -190,12 +188,12 @@ class KenAllClient:
     def search(
         self,
         *,
-        q: Optional[str] = None,
-        t: Optional[str] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet: Optional[str] = None,
-        version: Optional[str] = None,
+        q: str | None = None,
+        t: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet: str | None = None,
+        version: str | None = None,
         api_version: Literal["2025-01-01"] = ...,
     ) -> v20250101.AddressSearcherResponse: ...
 
@@ -203,12 +201,12 @@ class KenAllClient:
     def search(
         self,
         *,
-        q: Optional[str] = None,
-        t: Optional[str] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet: Optional[str] = None,
-        version: Optional[str] = None,
+        q: str | None = None,
+        t: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet: str | None = None,
+        version: str | None = None,
         api_version: Literal["2026-08-01"] = ...,
     ) -> v20260801.AddressSearcherResponse: ...
 
@@ -216,25 +214,25 @@ class KenAllClient:
     def search(
         self,
         *,
-        q: Optional[str] = None,
-        t: Optional[str] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet: Optional[str] = None,
-        version: Optional[str] = None,
+        q: str | None = None,
+        t: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet: str | None = None,
+        version: str | None = None,
         api_version: None = None,
     ) -> compatible.AddressSearcherResponse: ...
 
     def search(
         self,
         *,
-        q: Optional[str] = None,
-        t: Optional[str] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet: Optional[str] = None,
-        version: Optional[str] = None,
-        api_version: Optional[APIVersion] = None,
+        q: str | None = None,
+        t: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet: str | None = None,
+        version: str | None = None,
+        api_version: APIVersion | None = None,
     ):
         """Search addresses
 
@@ -261,7 +259,7 @@ class KenAllClient:
         prefecture_code: str,
         api_version: Literal["2022-11-01"] = ...,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> v20221101.CityResolverResponse: ...
 
     @overload
@@ -270,7 +268,7 @@ class KenAllClient:
         prefecture_code: str,
         api_version: Literal["2023-09-01"] = ...,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> v20230901.CityResolverResponse: ...
 
     @overload
@@ -279,7 +277,7 @@ class KenAllClient:
         prefecture_code: str,
         api_version: Literal["2024-01-01"] = ...,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> v20240101.CityResolverResponse: ...
 
     @overload
@@ -288,7 +286,7 @@ class KenAllClient:
         prefecture_code: str,
         api_version: Literal["2025-01-01"] = ...,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> v20250101.CityResolverResponse: ...
 
     @overload
@@ -297,7 +295,7 @@ class KenAllClient:
         prefecture_code: str,
         api_version: Literal["2026-08-01"] = ...,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> v20260801.CityResolverResponse: ...
 
     @overload
@@ -306,15 +304,15 @@ class KenAllClient:
         prefecture_code: str,
         api_version: None = None,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> compatible.CityResolverResponse: ...
 
     def get_cities(
         self,
         prefecture_code: str,
-        api_version: Optional[APIVersion] = None,
+        api_version: APIVersion | None = None,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ):
         """Get the cities that belong to the prefecture
 
@@ -345,7 +343,7 @@ class KenAllClient:
         self, houjinbangou: str, api_version: None = None
     ) -> compatible.NTACorporateInfoResolverResponse: ...
 
-    def get_houjin(self, houjinbangou: str, api_version: Optional[APIVersion] = None):
+    def get_houjin(self, houjinbangou: str, api_version: APIVersion | None = None):
         """Get corporate info by houjinbangou"""
         req = self.create_houjin_request(houjinbangou, api_version)
         return self.fetch_houjin_result(req, api_version)
@@ -354,13 +352,13 @@ class KenAllClient:
     def search_houjin(
         self,
         q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        mode: Optional[str] = None,
-        facet_area: Optional[str] = None,
-        facet_kind: Optional[str] = None,
-        facet_process: Optional[str] = None,
-        facet_close_cause: Optional[str] = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        mode: str | None = None,
+        facet_area: str | None = None,
+        facet_kind: str | None = None,
+        facet_process: str | None = None,
+        facet_close_cause: str | None = None,
         api_version: Literal["2024-01-01"] = ...,
     ) -> v20240101.NTACorporateInfoSearcherResponse: ...
 
@@ -368,13 +366,13 @@ class KenAllClient:
     def search_houjin(
         self,
         q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        mode: Optional[str] = None,
-        facet_area: Optional[str] = None,
-        facet_kind: Optional[str] = None,
-        facet_process: Optional[str] = None,
-        facet_close_cause: Optional[str] = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        mode: str | None = None,
+        facet_area: str | None = None,
+        facet_kind: str | None = None,
+        facet_process: str | None = None,
+        facet_close_cause: str | None = None,
         api_version: Literal["2025-01-01"] = ...,
     ) -> v20250101.NTACorporateInfoSearcherResponse: ...
 
@@ -382,13 +380,13 @@ class KenAllClient:
     def search_houjin(
         self,
         q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        mode: Optional[str] = None,
-        facet_area: Optional[str] = None,
-        facet_kind: Optional[str] = None,
-        facet_process: Optional[str] = None,
-        facet_close_cause: Optional[str] = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        mode: str | None = None,
+        facet_area: str | None = None,
+        facet_kind: str | None = None,
+        facet_process: str | None = None,
+        facet_close_cause: str | None = None,
         api_version: Literal["2026-08-01"] = ...,
     ) -> v20260801.NTACorporateInfoSearcherResponse: ...
 
@@ -396,27 +394,27 @@ class KenAllClient:
     def search_houjin(
         self,
         q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        mode: Optional[str] = None,
-        facet_area: Optional[str] = None,
-        facet_kind: Optional[str] = None,
-        facet_process: Optional[str] = None,
-        facet_close_cause: Optional[str] = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        mode: str | None = None,
+        facet_area: str | None = None,
+        facet_kind: str | None = None,
+        facet_process: str | None = None,
+        facet_close_cause: str | None = None,
         api_version: None = None,
     ) -> compatible.NTACorporateInfoSearcherResponse: ...
 
     def search_houjin(
         self,
         q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        mode: Optional[str] = None,
-        facet_area: Optional[str] = None,
-        facet_kind: Optional[str] = None,
-        facet_process: Optional[str] = None,
-        facet_close_cause: Optional[str] = None,
-        api_version: Optional[APIVersion] = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        mode: str | None = None,
+        facet_area: str | None = None,
+        facet_kind: str | None = None,
+        facet_process: str | None = None,
+        facet_close_cause: str | None = None,
+        api_version: APIVersion | None = None,
     ):
         """Search corporate info"""
         req = self.create_houjin_search_request(
@@ -454,7 +452,7 @@ class KenAllClient:
     ) -> compatible.NTAQualifiedInvoiceIssuerInfoResolverResponse: ...
 
     def get_invoice_issuer(
-        self, issuer_number: str, api_version: Optional[APIVersion] = None
+        self, issuer_number: str, api_version: APIVersion | None = None
     ):
         """Get qualified invoice issuer info by issuer number"""
         req = self.create_invoice_issuer_request(issuer_number, api_version)
@@ -463,10 +461,10 @@ class KenAllClient:
     # Holiday search (same across all versions)
     def search_holiday(
         self,
-        year: Optional[int] = None,
-        from_: Optional[str] = None,
-        to: Optional[str] = None,
-        api_version: Optional[APIVersion] = None,
+        year: int | None = None,
+        from_: str | None = None,
+        to: str | None = None,
+        api_version: APIVersion | None = None,
     ) -> HolidaySearchResult:
         """Search holidays"""
 
@@ -477,7 +475,7 @@ class KenAllClient:
 
     # Business day check (same across all versions)
     def check_business_day(
-        self, date: str, api_version: Optional[APIVersion] = None
+        self, date: str, api_version: APIVersion | None = None
     ) -> BusinessDayCheckResponse:
         """Tell whether the date is a business day
 
@@ -488,7 +486,7 @@ class KenAllClient:
         return self.fetch_business_day_check_result(req, api_version)
 
     # Whoami (same across all versions)
-    def whoami(self, api_version: Optional[APIVersion] = None) -> WhoamiResponse:
+    def whoami(self, api_version: APIVersion | None = None) -> WhoamiResponse:
         """Get the IP address the request was made from"""
         req = self.create_whoami_request(api_version)
         return self.fetch_whoami_result(req, api_version)
@@ -517,7 +515,7 @@ class KenAllClient:
     @overload
     def get_banks(self, api_version: None = None) -> compatible.BanksResponse: ...
 
-    def get_banks(self, api_version: Optional[APIVersion] = None):
+    def get_banks(self, api_version: APIVersion | None = None):
         """Get all banks"""
         req = self.create_banks_request(api_version)
         return self.fetch_banks_result(req, api_version)
@@ -527,10 +525,10 @@ class KenAllClient:
     def search_banks(
         self,
         *,
-        q: Optional[str] = None,
-        match: Optional[BankSearchMatchMode] = None,
-        type: Optional[BankType] = None,
-        version: Optional[str] = None,
+        q: str | None = None,
+        match: BankSearchMatchMode | None = None,
+        type: BankType | None = None,
+        version: str | None = None,
         api_version: Literal["2026-08-01"] = ...,
     ) -> v20260801.BanksResponse: ...
 
@@ -538,21 +536,21 @@ class KenAllClient:
     def search_banks(
         self,
         *,
-        q: Optional[str] = None,
-        match: Optional[BankSearchMatchMode] = None,
-        type: Optional[BankType] = None,
-        version: Optional[str] = None,
+        q: str | None = None,
+        match: BankSearchMatchMode | None = None,
+        type: BankType | None = None,
+        version: str | None = None,
         api_version: None = None,
     ) -> compatible.BanksResponse: ...
 
     def search_banks(
         self,
         *,
-        q: Optional[str] = None,
-        match: Optional[BankSearchMatchMode] = None,
-        type: Optional[BankType] = None,
-        version: Optional[str] = None,
-        api_version: Optional[BankSearchAPIVersion] = None,
+        q: str | None = None,
+        match: BankSearchMatchMode | None = None,
+        type: BankType | None = None,
+        version: str | None = None,
+        api_version: BankSearchAPIVersion | None = None,
     ):
         """Search banks by name, by kana reading, or by institution category
 
@@ -602,7 +600,7 @@ class KenAllClient:
         self, bank_code: str, api_version: None = None
     ) -> compatible.BankResolverResponse: ...
 
-    def get_bank(self, bank_code: str, api_version: Optional[APIVersion] = None):
+    def get_bank(self, bank_code: str, api_version: APIVersion | None = None):
         """Get specific bank"""
         req = self.create_bank_request(bank_code, api_version)
         return self.fetch_bank_result(req, api_version)
@@ -632,9 +630,7 @@ class KenAllClient:
         self, bank_code: str, api_version: None = None
     ) -> compatible.BankBranchesResponse: ...
 
-    def get_bank_branches(
-        self, bank_code: str, api_version: Optional[APIVersion] = None
-    ):
+    def get_bank_branches(self, bank_code: str, api_version: APIVersion | None = None):
         """Get branches for a bank"""
         req = self.create_bank_branches_request(bank_code, api_version)
         return self.fetch_bank_branches_result(req, api_version)
@@ -645,9 +641,9 @@ class KenAllClient:
         self,
         bank_code: str,
         *,
-        q: Optional[str] = None,
-        match: Optional[BankSearchMatchMode] = None,
-        version: Optional[str] = None,
+        q: str | None = None,
+        match: BankSearchMatchMode | None = None,
+        version: str | None = None,
         api_version: Literal["2026-08-01"] = ...,
     ) -> v20260801.BankBranchesResponse: ...
 
@@ -656,9 +652,9 @@ class KenAllClient:
         self,
         bank_code: str,
         *,
-        q: Optional[str] = None,
-        match: Optional[BankSearchMatchMode] = None,
-        version: Optional[str] = None,
+        q: str | None = None,
+        match: BankSearchMatchMode | None = None,
+        version: str | None = None,
         api_version: None = None,
     ) -> compatible.BankBranchesResponse: ...
 
@@ -666,10 +662,10 @@ class KenAllClient:
         self,
         bank_code: str,
         *,
-        q: Optional[str] = None,
-        match: Optional[BankSearchMatchMode] = None,
-        version: Optional[str] = None,
-        api_version: Optional[BankSearchAPIVersion] = None,
+        q: str | None = None,
+        match: BankSearchMatchMode | None = None,
+        version: str | None = None,
+        api_version: BankSearchAPIVersion | None = None,
     ):
         """Search the branches of a bank by name or by kana reading
 
@@ -716,7 +712,7 @@ class KenAllClient:
     ) -> compatible.BankBranchResolverResponse: ...
 
     def get_bank_branch(
-        self, bank_code: str, branch_code: str, api_version: Optional[APIVersion] = None
+        self, bank_code: str, branch_code: str, api_version: APIVersion | None = None
     ):
         """Get specific branch"""
         req = self.create_bank_branch_request(bank_code, branch_code, api_version)
@@ -726,9 +722,9 @@ class KenAllClient:
     def create_request(
         self,
         postal_code: str,
-        api_version: Optional[APIVersion] = None,
+        api_version: APIVersion | None = None,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> urllib.request.Request:
         """Create request for postal code lookup"""
         url = urllib.parse.urljoin(
@@ -741,16 +737,16 @@ class KenAllClient:
     def create_address_search_request(
         self,
         *,
-        q: Optional[str] = None,
-        t: Optional[str] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet: Optional[str] = None,
-        version: Optional[str] = None,
-        api_version: Optional[APIVersion] = None,
+        q: str | None = None,
+        t: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet: str | None = None,
+        version: str | None = None,
+        api_version: APIVersion | None = None,
     ) -> urllib.request.Request:
         """Create request for address search"""
-        query_mapping: List[Tuple[str, Optional[str]]] = [
+        query_mapping: list[tuple[str, str | None]] = [
             ("q", q),
             ("t", t),
             ("offset", str(offset) if offset is not None else None),
@@ -765,9 +761,7 @@ class KenAllClient:
         url = f"{self.api_url}/v1/postalcode/?{query}"
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
-    def fetch(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
-    ):
+    def fetch(self, req: urllib.request.Request, api_version: APIVersion | None = None):
         """Backward compatibility method for tests"""
         with urllib.request.urlopen(req) as res:
             if not res.headers["Content-Type"].startswith("application/json"):
@@ -777,7 +771,7 @@ class KenAllClient:
         return create_address_resolver_response(d, api_version)
 
     def fetch_address_search_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ):
         """Fetch address search result with version awareness"""
         with urllib.request.urlopen(req) as res:
@@ -788,7 +782,7 @@ class KenAllClient:
         return create_address_searcher_response(d, api_version)
 
     def create_houjin_request(
-        self, houjinbangou: str, api_version: Optional[APIVersion] = None
+        self, houjinbangou: str, api_version: APIVersion | None = None
     ) -> urllib.request.Request:
         """Backward compatibility method for tests"""
         url = f"{self.api_url}/v1/houjinbangou/{houjinbangou}"
@@ -797,17 +791,17 @@ class KenAllClient:
     def create_houjin_search_request(
         self,
         q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        mode: Optional[str] = None,
-        facet_area: Optional[str] = None,
-        facet_kind: Optional[str] = None,
-        facet_process: Optional[str] = None,
-        facet_close_cause: Optional[str] = None,
-        api_version: Optional[APIVersion] = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        mode: str | None = None,
+        facet_area: str | None = None,
+        facet_kind: str | None = None,
+        facet_process: str | None = None,
+        facet_close_cause: str | None = None,
+        api_version: APIVersion | None = None,
     ) -> urllib.request.Request:
         """Create request for houjin search"""
-        query_mapping: List[Tuple[str, Optional[str]]] = [
+        query_mapping: list[tuple[str, str | None]] = [
             ("q", q),
             ("offset", str(offset) if offset is not None else None),
             ("limit", str(limit) if limit is not None else None),
@@ -831,7 +825,7 @@ class KenAllClient:
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
     def fetch_houjin_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ):
         """Backward compatibility method for tests"""
         with urllib.request.urlopen(req) as res:
@@ -842,7 +836,7 @@ class KenAllClient:
         return create_corporate_info_resolver_response(d, api_version)
 
     def fetch_search_houjin_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ):
         """Backward compatibility method for tests"""
         with urllib.request.urlopen(req) as res:
@@ -853,14 +847,14 @@ class KenAllClient:
         return create_corporate_info_searcher_response(d, api_version)
 
     def create_invoice_issuer_request(
-        self, issuer_number: str, api_version: Optional[APIVersion] = None
+        self, issuer_number: str, api_version: APIVersion | None = None
     ) -> urllib.request.Request:
         """Create request for qualified invoice issuer lookup"""
         url = f"{self.api_url}/v1/invoice/{issuer_number}"
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
     def fetch_invoice_issuer_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ):
         """Fetch invoice issuer result with version awareness"""
         with urllib.request.urlopen(req) as res:
@@ -871,14 +865,14 @@ class KenAllClient:
         return create_invoice_issuer_resolver_response(d, api_version)
 
     def create_whoami_request(
-        self, api_version: Optional[APIVersion] = None
+        self, api_version: APIVersion | None = None
     ) -> urllib.request.Request:
         """Create request for whoami"""
         url = f"{self.api_url}/v1/whoami"
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
     def fetch_whoami_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ) -> WhoamiResponse:
         """Fetch whoami result"""
         with urllib.request.urlopen(req) as res:
@@ -889,7 +883,7 @@ class KenAllClient:
         return WhoamiResponse.fromdict(d)
 
     def create_business_day_check_request(
-        self, date: str, api_version: Optional[APIVersion] = None
+        self, date: str, api_version: APIVersion | None = None
     ) -> urllib.request.Request:
         """Create request for business day check"""
         query = urllib.parse.urlencode([("date", date)])
@@ -897,7 +891,7 @@ class KenAllClient:
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
     def fetch_business_day_check_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ) -> BusinessDayCheckResponse:
         """Fetch business day check result"""
         with urllib.request.urlopen(req) as res:
@@ -908,7 +902,7 @@ class KenAllClient:
         return BusinessDayCheckResponse.fromdict(d)
 
     def fetch_search_holiday_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ):
         """Backward compatibility method for tests"""
         with urllib.request.urlopen(req) as res:
@@ -922,13 +916,13 @@ class KenAllClient:
 
     def create_holiday_search_request(
         self,
-        year: Optional[int] = None,
-        from_date: Optional[str] = None,
-        to_date: Optional[str] = None,
-        api_version: Optional[APIVersion] = None,
+        year: int | None = None,
+        from_date: str | None = None,
+        to_date: str | None = None,
+        api_version: APIVersion | None = None,
     ) -> urllib.request.Request:
         """Create request for holiday search"""
-        query_mapping: List[Tuple[str, Optional[str]]] = [
+        query_mapping: list[tuple[str, str | None]] = [
             ("year", str(year) if year is not None else None),
             ("from", from_date),
             ("to", to_date),
@@ -943,9 +937,9 @@ class KenAllClient:
     def create_city_request(
         self,
         city_code: str,
-        api_version: Optional[APIVersion] = None,
+        api_version: APIVersion | None = None,
         *,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> urllib.request.Request:
         """Create request for city lookup"""
         url = f"{self.api_url}/v1/cities/{city_code}"
@@ -954,7 +948,7 @@ class KenAllClient:
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
     def fetch_city_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ):
         """Fetch city result with version awareness"""
         with urllib.request.urlopen(req) as res:
@@ -966,14 +960,14 @@ class KenAllClient:
 
     # Bank API helper methods
     def create_banks_request(
-        self, api_version: Optional[APIVersion] = None
+        self, api_version: APIVersion | None = None
     ) -> urllib.request.Request:
         """Create request for getting all banks"""
         url = f"{self.api_url}/v1/bank"
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
     def fetch_banks_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ):
         """Fetch banks result with version awareness"""
         with urllib.request.urlopen(req) as res:
@@ -986,14 +980,14 @@ class KenAllClient:
     def create_bank_search_request(
         self,
         *,
-        q: Optional[str] = None,
-        match: Optional[BankSearchMatchMode] = None,
-        type: Optional[BankType] = None,
-        version: Optional[str] = None,
-        api_version: Optional[BankSearchAPIVersion] = None,
+        q: str | None = None,
+        match: BankSearchMatchMode | None = None,
+        type: BankType | None = None,
+        version: str | None = None,
+        api_version: BankSearchAPIVersion | None = None,
     ) -> urllib.request.Request:
         """Create request for bank search"""
-        query_mapping: List[Tuple[str, Optional[str]]] = [
+        query_mapping: list[tuple[str, str | None]] = [
             ("q", q),
             ("match", match),
             ("type", type),
@@ -1009,14 +1003,14 @@ class KenAllClient:
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
     def create_bank_request(
-        self, bank_code: str, api_version: Optional[APIVersion] = None
+        self, bank_code: str, api_version: APIVersion | None = None
     ) -> urllib.request.Request:
         """Create request for getting specific bank"""
         url = f"{self.api_url}/v1/bank/{bank_code}"
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
     def fetch_bank_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ):
         """Fetch bank result with version awareness"""
         with urllib.request.urlopen(req) as res:
@@ -1027,7 +1021,7 @@ class KenAllClient:
         return create_bank_resolver_response(d, api_version)
 
     def create_bank_branches_request(
-        self, bank_code: str, api_version: Optional[APIVersion] = None
+        self, bank_code: str, api_version: APIVersion | None = None
     ) -> urllib.request.Request:
         """Create request for getting bank branches"""
         url = f"{self.api_url}/v1/bank/{bank_code}/branches"
@@ -1037,13 +1031,13 @@ class KenAllClient:
         self,
         bank_code: str,
         *,
-        q: Optional[str] = None,
-        match: Optional[BankSearchMatchMode] = None,
-        version: Optional[str] = None,
-        api_version: Optional[BankSearchAPIVersion] = None,
+        q: str | None = None,
+        match: BankSearchMatchMode | None = None,
+        version: str | None = None,
+        api_version: BankSearchAPIVersion | None = None,
     ) -> urllib.request.Request:
         """Create request for bank branch search"""
-        query_mapping: List[Tuple[str, Optional[str]]] = [
+        query_mapping: list[tuple[str, str | None]] = [
             ("q", q),
             ("match", match),
             ("version", version),
@@ -1058,7 +1052,7 @@ class KenAllClient:
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
     def fetch_bank_branches_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ):
         """Fetch bank branches result with version awareness"""
         with urllib.request.urlopen(req) as res:
@@ -1069,14 +1063,14 @@ class KenAllClient:
         return create_bank_branches_response(d, api_version)
 
     def create_bank_branch_request(
-        self, bank_code: str, branch_code: str, api_version: Optional[APIVersion] = None
+        self, bank_code: str, branch_code: str, api_version: APIVersion | None = None
     ) -> urllib.request.Request:
         """Create request for getting specific bank branch"""
         url = f"{self.api_url}/v1/bank/{bank_code}/branches/{branch_code}"
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
     def fetch_bank_branch_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ):
         """Fetch bank branch result with version awareness"""
         with urllib.request.urlopen(req) as res:
@@ -1102,7 +1096,7 @@ class KenAllClient:
         self, school_code: str, api_version: None = None
     ) -> v20250101.SchoolResolverResponse: ...
 
-    def get_school(self, school_code: str, api_version: Optional[APIVersion] = None):
+    def get_school(self, school_code: str, api_version: APIVersion | None = None):
         """Get school information by school code"""
         req = self.create_school_request(school_code, api_version)
         return self.fetch_school_result(req, api_version)
@@ -1111,13 +1105,13 @@ class KenAllClient:
     def search_school(
         self,
         q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet_area: Optional[str] = None,
-        facet_prefecture: Optional[str] = None,
-        facet_type: Optional[str] = None,
-        facet_establishment_type: Optional[str] = None,
-        facet_branch: Optional[str] = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet_area: str | None = None,
+        facet_prefecture: str | None = None,
+        facet_type: str | None = None,
+        facet_establishment_type: str | None = None,
+        facet_branch: str | None = None,
         api_version: Literal["2025-01-01"] = ...,
     ) -> v20250101.SchoolSearcherResponse: ...
 
@@ -1125,13 +1119,13 @@ class KenAllClient:
     def search_school(
         self,
         q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet_area: Optional[str] = None,
-        facet_prefecture: Optional[str] = None,
-        facet_type: Optional[str] = None,
-        facet_establishment_type: Optional[str] = None,
-        facet_branch: Optional[str] = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet_area: str | None = None,
+        facet_prefecture: str | None = None,
+        facet_type: str | None = None,
+        facet_establishment_type: str | None = None,
+        facet_branch: str | None = None,
         api_version: Literal["2026-08-01"] = ...,
     ) -> v20260801.SchoolSearcherResponse: ...
 
@@ -1139,27 +1133,27 @@ class KenAllClient:
     def search_school(
         self,
         q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet_area: Optional[str] = None,
-        facet_prefecture: Optional[str] = None,
-        facet_type: Optional[str] = None,
-        facet_establishment_type: Optional[str] = None,
-        facet_branch: Optional[str] = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet_area: str | None = None,
+        facet_prefecture: str | None = None,
+        facet_type: str | None = None,
+        facet_establishment_type: str | None = None,
+        facet_branch: str | None = None,
         api_version: None = None,
     ) -> v20250101.SchoolSearcherResponse: ...
 
     def search_school(
         self,
         q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet_area: Optional[str] = None,
-        facet_prefecture: Optional[str] = None,
-        facet_type: Optional[str] = None,
-        facet_establishment_type: Optional[str] = None,
-        facet_branch: Optional[str] = None,
-        api_version: Optional[APIVersion] = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet_area: str | None = None,
+        facet_prefecture: str | None = None,
+        facet_type: str | None = None,
+        facet_establishment_type: str | None = None,
+        facet_branch: str | None = None,
+        api_version: APIVersion | None = None,
     ):
         """Search school information"""
         req = self.create_school_search_request(
@@ -1177,14 +1171,14 @@ class KenAllClient:
 
     # School API helper methods
     def create_school_request(
-        self, school_code: str, api_version: Optional[APIVersion] = None
+        self, school_code: str, api_version: APIVersion | None = None
     ) -> urllib.request.Request:
         """Create request for school lookup"""
         url = f"{self.api_url}/v1/school/{school_code}"
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
     def fetch_school_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ):
         """Fetch school result with version awareness"""
         with urllib.request.urlopen(req) as res:
@@ -1197,17 +1191,17 @@ class KenAllClient:
     def create_school_search_request(
         self,
         q: str,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
-        facet_area: Optional[str] = None,
-        facet_prefecture: Optional[str] = None,
-        facet_type: Optional[str] = None,
-        facet_establishment_type: Optional[str] = None,
-        facet_branch: Optional[str] = None,
-        api_version: Optional[APIVersion] = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        facet_area: str | None = None,
+        facet_prefecture: str | None = None,
+        facet_type: str | None = None,
+        facet_establishment_type: str | None = None,
+        facet_branch: str | None = None,
+        api_version: APIVersion | None = None,
     ) -> urllib.request.Request:
         """Create request for school search"""
-        query_mapping: List[Tuple[str, Optional[str]]] = [
+        query_mapping: list[tuple[str, str | None]] = [
             ("q", q),
             ("offset", str(offset) if offset is not None else None),
             ("limit", str(limit) if limit is not None else None),
@@ -1232,7 +1226,7 @@ class KenAllClient:
         return urllib.request.Request(url, headers=self._build_headers(api_version))
 
     def fetch_school_search_result(
-        self, req: urllib.request.Request, api_version: Optional[APIVersion] = None
+        self, req: urllib.request.Request, api_version: APIVersion | None = None
     ):
         """Fetch school search result with version awareness"""
         with urllib.request.urlopen(req) as res:

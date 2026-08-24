@@ -1,7 +1,7 @@
 """Models for API version 2025-01-01"""
 
 import dataclasses
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 __all__ = [
     "Address",
@@ -40,12 +40,12 @@ class Corporation:
     name: str
     name_kana: str
     block_lot: str
-    block_lot_num: Optional[str]
+    block_lot_num: str | None
     post_office: str
     code_type: int
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "Corporation":
+    def fromdict(cls, d: dict[str, Any]) -> "Corporation":
         return cls(**d)
 
 
@@ -72,7 +72,7 @@ class Address:
     town_chome: bool
     town_multi: bool
     town_raw: str
-    corporation: Optional[Corporation]
+    corporation: Corporation | None
     # New fields in v2022-11-01
     prefecture_roman: str
     city_roman: str
@@ -91,7 +91,7 @@ class Address:
     update_reason: int
 
     @classmethod
-    def fromdict(cls, i: Dict[str, Any]) -> "Address":
+    def fromdict(cls, i: dict[str, Any]) -> "Address":
         if i.get("corporation"):
             i = dict(i)
             i["corporation"] = Corporation.fromdict(i["corporation"])
@@ -103,10 +103,10 @@ class AddressResolverResponse:
     """Address resolver response for v2022-11-01"""
 
     version: str
-    data: List[Address]
+    data: list[Address]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "AddressResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "AddressResolverResponse":
         data = [Address.fromdict(i) for i in d["data"]]
         return cls(version=d["version"], data=data)
 
@@ -116,15 +116,15 @@ class AddressSearcherResponse:
     """Address searcher response for v2022-11-01"""
 
     version: str
-    data: List[Address]
+    data: list[Address]
     query: str
     count: int
-    offset: Optional[int]
-    limit: Optional[int]
-    facets: Optional[List[Tuple[str, int]]]
+    offset: int | None
+    limit: int | None
+    facets: list[tuple[str, int]] | None
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "AddressSearcherResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "AddressSearcherResponse":
         data = [Address.fromdict(i) for i in d["data"]]
         dd = dict(d)
         dd["data"] = data
@@ -153,7 +153,7 @@ class City:
     city_without_county_and_ward_roman: str
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "City":
+    def fromdict(cls, d: dict[str, Any]) -> "City":
         return cls(**d)
 
 
@@ -162,10 +162,10 @@ class CityResolverResponse:
     """City resolver response for v2022-11-01"""
 
     version: str
-    data: List[City]
+    data: list[City]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "CityResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "CityResolverResponse":
         data = [City.fromdict(i) for i in d["data"]]
         return cls(version=d["version"], data=data)
 
@@ -182,7 +182,7 @@ class Bank:
     romaji: str
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "Bank":
+    def fromdict(cls, d: dict[str, Any]) -> "Bank":
         return cls(**d)
 
 
@@ -197,7 +197,7 @@ class BankBranch:
     romaji: str
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BankBranch":
+    def fromdict(cls, d: dict[str, Any]) -> "BankBranch":
         return cls(**d)
 
 
@@ -206,10 +206,10 @@ class BanksResponse:
     """Banks response for v2023-09-01"""
 
     version: str
-    data: List[Bank]
+    data: list[Bank]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BanksResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "BanksResponse":
         data = [Bank.fromdict(i) for i in d["data"]]
         return cls(version=d["version"], data=data)
 
@@ -222,7 +222,7 @@ class BankResolverResponse:
     data: Bank
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BankResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "BankResolverResponse":
         return cls(version=d["version"], data=Bank.fromdict(d["data"]))
 
 
@@ -231,10 +231,10 @@ class BankBranchesData:
     """Nested data structure for bank branches response in v2025-01-01"""
 
     bank: Bank
-    branches: Dict[str, List[BankBranch]]
+    branches: dict[str, list[BankBranch]]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BankBranchesData":
+    def fromdict(cls, d: dict[str, Any]) -> "BankBranchesData":
         bank = Bank.fromdict(d["bank"])
         branches = {
             code: [BankBranch.fromdict(b) for b in branch_list]
@@ -251,7 +251,7 @@ class BankBranchesResponse:
     data: BankBranchesData
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BankBranchesResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "BankBranchesResponse":
         data = BankBranchesData.fromdict(d["data"])
         return cls(version=d["version"], data=data)
 
@@ -261,10 +261,10 @@ class BankBranchData:
     """Nested data structure for bank branch resolver response in v2025-01-01"""
 
     bank: Bank
-    branch: List[BankBranch]
+    branch: list[BankBranch]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BankBranchData":
+    def fromdict(cls, d: dict[str, Any]) -> "BankBranchData":
         bank = Bank.fromdict(d["bank"])
         branch = [BankBranch.fromdict(b) for b in d["branch"]]
         return cls(bank=bank, branch=branch)
@@ -278,7 +278,7 @@ class BankBranchResolverResponse:
     data: BankBranchData
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BankBranchResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "BankBranchResolverResponse":
         data = BankBranchData.fromdict(d["data"])
         return cls(version=d["version"], data=data)
 
@@ -304,7 +304,7 @@ class NTAEntityAddress:
     floor_room: str
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "NTAEntityAddress":
+    def fromdict(cls, d: dict[str, Any]) -> "NTAEntityAddress":
         return cls(**d)
 
 
@@ -314,26 +314,26 @@ class NTAQualifiedInvoiceIssuerInfo:
 
     published_date: str
     sequence_number: int
-    qualified_invoice_issuer_number: Optional[str]
+    qualified_invoice_issuer_number: str | None
     process: int
-    correct: Optional[int]
+    correct: int | None
     kind: int
     country: int
     latest: int
     registration_date: str
     update_date: str
     disposal_date: str
-    expire_date: Optional[str]
+    expire_date: str | None
     name: str
-    kana: Optional[str]
-    trade_name: Optional[str]
-    popular_name_previous_name: Optional[str]
-    address_inside: Optional[NTAEntityAddress]
-    address_request: Optional[NTAEntityAddress]
-    address: Optional[NTAEntityAddress]
+    kana: str | None
+    trade_name: str | None
+    popular_name_previous_name: str | None
+    address_inside: NTAEntityAddress | None
+    address_request: NTAEntityAddress | None
+    address: NTAEntityAddress | None
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "NTAQualifiedInvoiceIssuerInfo":
+    def fromdict(cls, d: dict[str, Any]) -> "NTAQualifiedInvoiceIssuerInfo":
         dd = dict(d)
         if dd.get("address_inside"):
             dd["address_inside"] = NTAEntityAddress.fromdict(dd["address_inside"])
@@ -353,7 +353,7 @@ class NTAQualifiedInvoiceIssuerInfoResolverResponse:
 
     @classmethod
     def fromdict(
-        cls, d: Dict[str, Any]
+        cls, d: dict[str, Any]
     ) -> "NTAQualifiedInvoiceIssuerInfoResolverResponse":
         return cls(
             version=d["version"], data=NTAQualifiedInvoiceIssuerInfo.fromdict(d["data"])
@@ -371,27 +371,27 @@ class NTACorporateInfo:
     update_date: str
     change_date: str
     name: str
-    name_image_id: Optional[str]
+    name_image_id: str | None
     kind: int
     published_date: str
     hihyoji: int
     furigana: str
-    en_address_outside: Optional[str]
-    en_address_line: Optional[str]
+    en_address_outside: str | None
+    en_address_line: str | None
     en_name: str
     assignment_date: str
     change_cause: str
-    successor_corporate_number: Optional[str]
-    close_cause: Optional[int]  # Changed from Optional[str] to Optional[int]
-    close_date: Optional[str]
-    address_outside_image_id: Optional[str]
+    successor_corporate_number: str | None
+    close_cause: int | None  # Changed from Optional[str] to Optional[int]
+    close_date: str | None
+    address_outside_image_id: str | None
     address_outside: str
-    address_image_id: Optional[str]
-    qualified_invoice_issuer_number: Optional[str]
+    address_image_id: str | None
+    qualified_invoice_issuer_number: str | None
     address: NTAEntityAddress
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "NTACorporateInfo":
+    def fromdict(cls, d: dict[str, Any]) -> "NTACorporateInfo":
         dd = dict(d)
         if dd.get("address"):
             dd["address"] = NTAEntityAddress.fromdict(dd["address"])
@@ -406,18 +406,18 @@ class NTACorporateInfoResolverResponse:
     data: NTACorporateInfo
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "NTACorporateInfoResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "NTACorporateInfoResolverResponse":
         return cls(version=d["version"], data=NTACorporateInfo.fromdict(d["data"]))
 
 
 @dataclasses.dataclass()
 class NTACorporateInfoFacetResults:
-    area: Optional[List[Tuple[str, int]]]
-    kind: Optional[List[Tuple[str, int]]]
-    process: Optional[List[Tuple[str, int]]]
-    close_cause: Optional[List[Tuple[str, int]]]
+    area: list[tuple[str, int]] | None
+    kind: list[tuple[str, int]] | None
+    process: list[tuple[str, int]] | None
+    close_cause: list[tuple[str, int]] | None
 
-    def __getitem__(self, v: Any) -> List[Tuple[str, int]]:
+    def __getitem__(self, v: Any) -> list[tuple[str, int]]:
         if v == "area":
             if self.area is not None:
                 return self.area
@@ -444,7 +444,7 @@ class NTACorporateInfoFacetResults:
         return False
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "NTACorporateInfoFacetResults":
+    def fromdict(cls, d: dict[str, Any]) -> "NTACorporateInfoFacetResults":
         return cls(
             area=[tuple(pair) for pair in d["area"]] if "area" in d else None,
             kind=[tuple(pair) for pair in d["kind"]] if "kind" in d else None,
@@ -460,7 +460,7 @@ class NTACorporateInfoSearcherResponse:
     """Corporate info searcher response for v2025-01-01"""
 
     version: str
-    data: List[str]
+    data: list[str]
     query: str
     count: int
     offset: int
@@ -468,7 +468,7 @@ class NTACorporateInfoSearcherResponse:
     facets: NTACorporateInfoFacetResults
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "NTACorporateInfoSearcherResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "NTACorporateInfoSearcherResponse":
         dd = dict(d)
         dd["data"] = [NTACorporateInfo.fromdict(i) for i in dd["data"]]
         dd["facets"] = NTACorporateInfoFacetResults.fromdict(dd.get("facets") or {})
@@ -487,14 +487,14 @@ class School:
     establishment_type: int
     branch: int
     address_raw: str
-    addresses: List[NTAEntityAddress]
+    addresses: list[NTAEntityAddress]
     established_date: str
-    abolished_date: Optional[str]
-    school_survey_number: Optional[str]
-    new_code: List[str]
+    abolished_date: str | None
+    school_survey_number: str | None
+    new_code: list[str]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "School":
+    def fromdict(cls, d: dict[str, Any]) -> "School":
         dd = dict(d)
         if dd.get("addresses"):
             dd["addresses"] = [
@@ -511,18 +511,18 @@ class SchoolResolverResponse:
     data: School
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "SchoolResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "SchoolResolverResponse":
         return cls(version=d["version"], data=School.fromdict(d["data"]))
 
 
 @dataclasses.dataclass()
 class SchoolFacetResults:
-    area: Optional[List[Tuple[str, int]]]
-    type: Optional[List[Tuple[str, int]]]
-    establishment_type: Optional[List[Tuple[str, int]]]
-    branch: Optional[List[Tuple[str, int]]]
+    area: list[tuple[str, int]] | None
+    type: list[tuple[str, int]] | None
+    establishment_type: list[tuple[str, int]] | None
+    branch: list[tuple[str, int]] | None
 
-    def __getitem__(self, v: Any) -> List[Tuple[str, int]]:
+    def __getitem__(self, v: Any) -> list[tuple[str, int]]:
         if v == "area":
             if self.area is not None:
                 return self.area
@@ -549,7 +549,7 @@ class SchoolFacetResults:
         return False
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "SchoolFacetResults":
+    def fromdict(cls, d: dict[str, Any]) -> "SchoolFacetResults":
         return cls(
             area=[tuple(pair) for pair in d["area"]] if "area" in d else None,
             type=[tuple(pair) for pair in d["type"]] if "type" in d else None,
@@ -565,15 +565,15 @@ class SchoolSearcherResponse:
     """School searcher response for v2025-01-01"""
 
     version: str
-    data: List[School]
+    data: list[School]
     query: str
     count: int
     offset: int
     limit: int
-    facets: Optional[SchoolFacetResults]
+    facets: SchoolFacetResults | None
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "SchoolSearcherResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "SchoolSearcherResponse":
         dd = dict(d)
         dd["data"] = [School.fromdict(i) for i in dd["data"]]
         dd["facets"] = SchoolFacetResults.fromdict(dd.get("facets") or {})
