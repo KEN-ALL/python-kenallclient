@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel", "setuptools_scm[toml]>=3.4"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [project]
 name = "kenallclient"
@@ -10,10 +10,9 @@ license = {text = "MIT"}
 authors = [
     {name = "Atsushi Odagiri", email = "aodagx@gmail.com"},
 ]
+requires-python = ">=3.11"
 dynamic = ["version"]
-dependencies = [
-    "dataclasses; python_version <= '3.6'",
-]
+dependencies = []
 
 [project.optional-dependencies]
 testing = [
@@ -26,19 +25,31 @@ dev = [
     "ruff",
     "mypy",
 ]
-release = [
-    "nox",
-    "build",
-    "twine",
-]
 
 [project.urls]
 Homepage = "https://github.com/ken-all/python-kenallclient"
 
-[tool.setuptools]
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.wheel]
 packages = ["kenallclient"]
 
-[tool.setuptools_scm]
+[tool.hatch.envs.test]
+features = ["testing"]
+
+[tool.hatch.envs.test.scripts]
+run = "pytest {args:tests}"
+
+[tool.hatch.envs.lint]
+features = ["dev"]
+
+[tool.hatch.envs.lint.scripts]
+check = [
+    "ruff check kenallclient",
+    "ruff format --check kenallclient",
+    "mypy kenallclient",
+]
 
 [tool.ruff]
 line-length = 88

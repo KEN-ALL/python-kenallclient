@@ -4,19 +4,41 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
+      fail-fast: false
       matrix:
         python-version:
-          - "3.10"
           - "3.11"
           - "3.12"
           - "3.13"
+          - "3.14"
+        experimental: [false]
+        include:
+          - python-version: "3.15"
+            experimental: true
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c  # v6
         with:
           python-version: ${{ matrix.python-version }}
-      - name: install nox
-        run: pip install nox
-      - name: run nox
-        run: nox
+          allow-prereleases: true
+      - name: install hatch
+        run: pip install hatch
+      - name: run tests
+        run: hatch run test:run
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c  # v6
+        with:
+          python-version: "3.13"
+      - name: install hatch
+        run: pip install hatch
+      - name: run lint
+        run: hatch run lint:check
