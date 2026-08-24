@@ -9,13 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c  # v6
         with:
-          python-version: "3.11"
-      - name: install nox
-        run: pip install nox
-      - name: run nox
-        run: nox -s pack
+          python-version: "3.13"
+      - name: install hatch
+        run: pip install hatch
+      - name: build
+        run: hatch build
       - name: Archive production artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
@@ -28,6 +30,5 @@ jobs:
           files: |
             dist/kenallclient-*.whl
             dist/kenallclient-*.tar.gz
-            dist/kenallclient-*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
