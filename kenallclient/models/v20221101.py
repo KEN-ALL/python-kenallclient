@@ -1,7 +1,7 @@
 """Models for API version 2022-11-01"""
 
 import dataclasses
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 __all__ = [
     "Address",
@@ -20,12 +20,12 @@ class Corporation:
     name: str
     name_kana: str
     block_lot: str
-    block_lot_num: Optional[str]
+    block_lot_num: str | None
     post_office: str
     code_type: int
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "Corporation":
+    def fromdict(cls, d: dict[str, Any]) -> "Corporation":
         return cls(**d)
 
 
@@ -52,7 +52,7 @@ class Address:
     town_chome: bool
     town_multi: bool
     town_raw: str
-    corporation: Optional[Corporation]
+    corporation: Corporation | None
     # New fields in v2022-11-01
     prefecture_roman: str
     city_roman: str
@@ -71,7 +71,7 @@ class Address:
     update_reason: int
 
     @classmethod
-    def fromdict(cls, i: Dict[str, Any]) -> "Address":
+    def fromdict(cls, i: dict[str, Any]) -> "Address":
         if i.get("corporation"):
             i = dict(i)
             i["corporation"] = Corporation.fromdict(i["corporation"])
@@ -83,10 +83,10 @@ class AddressResolverResponse:
     """Address resolver response for v2022-11-01"""
 
     version: str
-    data: List[Address]
+    data: list[Address]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "AddressResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "AddressResolverResponse":
         data = [Address.fromdict(i) for i in d["data"]]
         return cls(version=d["version"], data=data)
 
@@ -96,15 +96,15 @@ class AddressSearcherResponse:
     """Address searcher response for v2022-11-01"""
 
     version: str
-    data: List[Address]
+    data: list[Address]
     query: str
     count: int
-    offset: Optional[int]
-    limit: Optional[int]
-    facets: Optional[List[Tuple[str, int]]]
+    offset: int | None
+    limit: int | None
+    facets: list[tuple[str, int]] | None
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "AddressSearcherResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "AddressSearcherResponse":
         data = [Address.fromdict(i) for i in d["data"]]
         dd = dict(d)
         dd["data"] = data
@@ -130,7 +130,7 @@ class City:
     city_roman: str
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "City":
+    def fromdict(cls, d: dict[str, Any]) -> "City":
         return cls(**d)
 
 
@@ -139,9 +139,9 @@ class CityResolverResponse:
     """City resolver response for v2022-11-01"""
 
     version: str
-    data: List[City]
+    data: list[City]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "CityResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "CityResolverResponse":
         data = [City.fromdict(i) for i in d["data"]]
         return cls(version=d["version"], data=data)

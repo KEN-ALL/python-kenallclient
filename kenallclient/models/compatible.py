@@ -2,7 +2,7 @@
 
 import dataclasses
 from collections.abc import Sequence
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from . import APIVersion
 from .v20230901 import (
@@ -53,12 +53,12 @@ class Corporation:
     name: str
     name_kana: str
     block_lot: str
-    block_lot_num: Optional[str]
+    block_lot_num: str | None
     post_office: str
     code_type: int
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "Corporation":
+    def fromdict(cls, d: dict[str, Any]) -> "Corporation":
         return cls(**d)
 
 
@@ -66,12 +66,12 @@ class Corporation:
 class NTACorporateInfoFacetResults:
     """Facet results for corporate info (base class for compatibility)"""
 
-    area: Optional[List[Tuple[str, int]]]
-    kind: Optional[List[Tuple[str, int]]]
-    process: Optional[List[Tuple[str, int]]]
-    close_cause: Optional[List[Tuple[str, int]]]
+    area: list[tuple[str, int]] | None
+    kind: list[tuple[str, int]] | None
+    process: list[tuple[str, int]] | None
+    close_cause: list[tuple[str, int]] | None
 
-    def __getitem__(self, v: Any) -> List[Tuple[str, int]]:
+    def __getitem__(self, v: Any) -> list[tuple[str, int]]:
         if v == "area":
             if self.area is not None:
                 return self.area
@@ -98,7 +98,7 @@ class NTACorporateInfoFacetResults:
         return False
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "NTACorporateInfoFacetResults":
+    def fromdict(cls, d: dict[str, Any]) -> "NTACorporateInfoFacetResults":
         return cls(
             area=[tuple(pair) for pair in d["area"]] if "area" in d else None,
             kind=[tuple(pair) for pair in d["kind"]] if "kind" in d else None,
@@ -133,27 +133,27 @@ class Address:
     town_chome: bool
     town_multi: bool
     town_raw: str
-    corporation: Optional[Corporation]
+    corporation: Corporation | None
 
     # Fields added in v20221101 (made optional for compatibility)
-    prefecture_roman: Optional[str] = None
-    city_roman: Optional[str] = None
-    county: Optional[str] = None
-    county_kana: Optional[str] = None
-    county_roman: Optional[str] = None
-    city_without_county_and_ward: Optional[str] = None
-    city_without_county_and_ward_kana: Optional[str] = None
-    city_without_county_and_ward_roman: Optional[str] = None
-    city_ward: Optional[str] = None
-    city_ward_kana: Optional[str] = None
-    city_ward_roman: Optional[str] = None
-    town_roman: Optional[str] = None
-    town_jukyohyoji: Optional[bool] = None
-    update_status: Optional[int] = None
-    update_reason: Optional[int] = None
+    prefecture_roman: str | None = None
+    city_roman: str | None = None
+    county: str | None = None
+    county_kana: str | None = None
+    county_roman: str | None = None
+    city_without_county_and_ward: str | None = None
+    city_without_county_and_ward_kana: str | None = None
+    city_without_county_and_ward_roman: str | None = None
+    city_ward: str | None = None
+    city_ward_kana: str | None = None
+    city_ward_roman: str | None = None
+    town_roman: str | None = None
+    town_jukyohyoji: bool | None = None
+    update_status: int | None = None
+    update_reason: int | None = None
 
     @classmethod
-    def fromdict(cls, i: Dict[str, Any]) -> "Address":
+    def fromdict(cls, i: dict[str, Any]) -> "Address":
         # Create a copy to avoid modifying the original
         data = dict(i)
 
@@ -173,10 +173,10 @@ class AddressResolverResponse:
     """Compatible Address resolver response"""
 
     version: str
-    data: List[Address]
+    data: list[Address]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "AddressResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "AddressResolverResponse":
         data = [Address.fromdict(i) for i in d["data"]]
         return cls(version=d["version"], data=data)
 
@@ -186,15 +186,15 @@ class AddressSearcherResponse:
     """Compatible Address searcher response"""
 
     version: str
-    data: List[Address]
+    data: list[Address]
     query: str
     count: int
-    offset: Optional[int]
-    limit: Optional[int]
-    facets: Optional[List[Tuple[str, int]]]
+    offset: int | None
+    limit: int | None
+    facets: list[tuple[str, int]] | None
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "AddressSearcherResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "AddressSearcherResponse":
         data = [Address.fromdict(i) for i in d["data"]]
         dd = dict(d)
         dd["data"] = data
@@ -218,11 +218,11 @@ class City:
     city_kana: str
 
     # Fields added in v20221101 (made optional for compatibility)
-    prefecture_roman: Optional[str] = None
-    city_roman: Optional[str] = None
+    prefecture_roman: str | None = None
+    city_roman: str | None = None
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "City":
+    def fromdict(cls, d: dict[str, Any]) -> "City":
         # Filter out only the fields that exist in the class
         field_names = {f.name for f in dataclasses.fields(cls)}
         filtered_data = {k: v for k, v in d.items() if k in field_names}
@@ -234,10 +234,10 @@ class CityResolverResponse:
     """Compatible City resolver response"""
 
     version: str
-    data: List[City]
+    data: list[City]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "CityResolverResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "CityResolverResponse":
         data = [City.fromdict(i) for i in d["data"]]
         return cls(version=d["version"], data=data)
 
@@ -252,7 +252,7 @@ class Holiday:
     day_of_week_text: str
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "Holiday":
+    def fromdict(cls, d: dict[str, Any]) -> "Holiday":
         return cls(**d)
 
 
@@ -260,10 +260,10 @@ class Holiday:
 class HolidaySearchResult:
     """Holiday search result (same across all versions)"""
 
-    data: List[Holiday]
+    data: list[Holiday]
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "HolidaySearchResult":
+    def fromdict(cls, d: dict[str, Any]) -> "HolidaySearchResult":
         data = [Holiday.fromdict(i) for i in d["data"]]
         return HolidaySearchResult(data=data)
 
@@ -275,7 +275,7 @@ class BusinessDayCheckResponse:
     result: bool
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "BusinessDayCheckResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "BusinessDayCheckResponse":
         return cls(result=d["result"])
 
 
@@ -289,7 +289,7 @@ class RemoteAddress:
     address: str
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "RemoteAddress":
+    def fromdict(cls, d: dict[str, Any]) -> "RemoteAddress":
         return cls(**d)
 
 
@@ -300,7 +300,7 @@ class WhoamiResponse:
     remote_addr: RemoteAddress
 
     @classmethod
-    def fromdict(cls, d: Dict[str, Any]) -> "WhoamiResponse":
+    def fromdict(cls, d: dict[str, Any]) -> "WhoamiResponse":
         return cls(remote_addr=RemoteAddress.fromdict(d["remote_addr"]))
 
 
@@ -315,37 +315,37 @@ class NTACorporateInfo:
     update_date: str
     change_date: str
     name: str
-    name_image_id: Optional[str]
+    name_image_id: str | None
     kind: int
     prefecture_name: str
     city_name: str
     published_date: str
     hihyoji: int
     furigana: str
-    en_address_outside: Optional[str]
-    en_address_line: Optional[str]
+    en_address_outside: str | None
+    en_address_line: str | None
     en_prefecture_name: str
     en_name: str
     assignment_date: str
     change_cause: str
-    successor_corporate_number: Optional[str]
-    close_cause: Optional[str]
-    close_date: Optional[str]
-    address_outside_image_id: Optional[str]
+    successor_corporate_number: str | None
+    close_cause: str | None
+    close_date: str | None
+    address_outside_image_id: str | None
     address_outside: str
     post_code: str
     jisx0402: str
-    address_image_id: Optional[str]
+    address_image_id: str | None
     street_number: str
-    town: Optional[str]
-    kyoto_street: Optional[str]
-    block_lot_num: Optional[str]
-    building: Optional[str]
-    floor_room: Optional[str]
+    town: str | None
+    kyoto_street: str | None
+    block_lot_num: str | None
+    building: str | None
+    floor_room: str | None
 
     @classmethod
     def fromdict(
-        cls, d: Dict[str, Any], api_version: Optional[APIVersion] = None
+        cls, d: dict[str, Any], api_version: APIVersion | None = None
     ) -> "NTACorporateInfo":
         # Determine the data format based on structure, not the API version
         # v2025-01-01+ uses nested address object, earlier versions use flat structure
@@ -405,7 +405,7 @@ class NTACorporateInfoResolverResponse:
 
     @classmethod
     def fromdict(
-        cls, d: Dict[str, Any], api_version: Optional[APIVersion] = None
+        cls, d: dict[str, Any], api_version: APIVersion | None = None
     ) -> "NTACorporateInfoResolverResponse":
         return cls(
             version=d["version"], data=NTACorporateInfo.fromdict(d["data"], api_version)
@@ -417,7 +417,7 @@ class NTACorporateInfoSearcherResponse:
     """Compatible searcher response (no conversion needed for search results)"""
 
     version: str
-    data: List[NTACorporateInfo]
+    data: list[NTACorporateInfo]
     query: str
     count: int
     offset: int
@@ -426,7 +426,7 @@ class NTACorporateInfoSearcherResponse:
 
     @classmethod
     def fromdict(
-        cls, d: Dict[str, Any], api_version: Optional[APIVersion] = None
+        cls, d: dict[str, Any], api_version: APIVersion | None = None
     ) -> "NTACorporateInfoSearcherResponse":
         dd = dict(d)
         dd["facets"] = NTACorporateInfoFacetResults.fromdict(dd.get("facets") or {})
@@ -439,11 +439,11 @@ class BankBranchesResponse:
     """Compatible bank branches response that flattens the nested structure"""
 
     version: str
-    data: Dict[str, List[BankBranch]]
+    data: dict[str, list[BankBranch]]
 
     @classmethod
     def fromdict(
-        cls, d: Dict[str, Any], api_version: Optional[APIVersion] = None
+        cls, d: dict[str, Any], api_version: APIVersion | None = None
     ) -> "BankBranchesResponse":
         # Parse using the version-specific model
         # Infer API version from data structure if not provided
@@ -479,11 +479,11 @@ class BankBranchResolverResponse:
     """Compatible bank branch resolver response that flattens the nested structure"""
 
     version: str
-    data: List[BankBranch]
+    data: list[BankBranch]
 
     @classmethod
     def fromdict(
-        cls, d: Dict[str, Any], api_version: Optional[APIVersion] = None
+        cls, d: dict[str, Any], api_version: APIVersion | None = None
     ) -> "BankBranchResolverResponse":
         # Parse using the version-specific model
         # Infer API version from data structure if not provided
