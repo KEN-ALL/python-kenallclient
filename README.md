@@ -57,6 +57,87 @@ HoujinSearchResult(version='2022-02-17', data=[{'published_date': '2022-01-31', 
 HolidaySearchResult(data=[Holiday(title='元日', date='2022-01-01', day_of_week=6, day_of_week_text='saturday'), Holiday(title='成人の日', date='2022-01-10', day_of_week=1, day_of_week_text='monday')])
 ```
 
+`get_cities` method gets the cities that belong to a prefecture.
+
+```
+>>> client.get_cities("13")
+CityResolverResponse(version='2022-08-31', data=[City(jisx0402='13101', prefecture='東京都', prefecture_code='13', ...)])
+```
+
+`get_invoice_issuer` method gets a qualified invoice issuer by its issuer number.
+
+```
+>>> client.get_invoice_issuer("T2021001052596")
+NTAQualifiedInvoiceIssuerInfoResolverResponse(version='2023-10-25', data=NTAQualifiedInvoiceIssuerInfo(qualified_invoice_issuer_number='T2021001052596', ...))
+```
+
+`check_business_day` method tells whether a date is a business day, that is, a
+day which is neither a weekend nor a public holiday.
+
+```
+>>> client.check_business_day("2022-01-04")
+BusinessDayCheckResponse(result=True)
+```
+
+`whoami` method gets the IP address the request was made from.
+
+```
+>>> client.whoami()
+WhoamiResponse(remote_addr=RemoteAddress(type='v4', address='192.0.2.1'))
+```
+
+#### bank methods
+
+`get_banks`, `get_bank`, `get_bank_branches` and `get_bank_branch` retrieve the
+financial institutions and their branches.
+
+```
+>>> client.get_bank("0001")
+BankResolverResponse(version='2023-10-01', data=Bank(code='0001', name='みずほ銀行', katakana='ミズホ', hiragana='みずほ', romaji='mizuho'))
+```
+
+`search_banks` and `search_bank_branches` narrow those sets down. They were
+introduced in the 2026-08-01 API version; earlier versions ignore the search
+parameters and return the whole set, so `api_version` cannot be an older one.
+
+```
+>>> client.search_banks(q="みずほ", match="contains", api_version="2026-08-01")
+BanksResponse(version='2026-08-01', data=[Bank(code='0001', name='みずほ銀行', katakana='ミズホ', hiragana='みずほ', romaji='mizuho')])
+>>> client.search_bank_branches("0001", q="横浜", api_version="2026-08-01")
+BankBranchesResponse(version='2026-08-01', data=BankBranchesData(bank=Bank(code='0001', ...), branches={'026': [BankBranch(code='026', name='横浜支店', ...)]}))
+```
+
+`q` matches both the names and the kana readings. Hiragana, katakana and kanji
+are all accepted; the differences in small kana, prolonged sound marks and
+character width are normalized away before matching, and a trailing
+institution-type suffix such as `銀行` or `信用金庫` (`支店` for branches) is
+ignored. `match` is either `prefix` (the default, which suits an incremental
+narrowing UI) or `contains`. `type` selects a category of the institutions, and
+is one of `bank`, `shinkin`, `shinkumi_rokin`, `nokyo_gyokyo` or `yucho`.
+
+Unlike the plain listings, an empty result is not an error here: as long as `q`
+or `type` is given, the API responds with a 200 and an empty result instead of
+a 404.
+
+#### API versions and database versions
+
+Every method takes an `api_version` argument, which pins the shape of the
+response payload and is sent as the `KenAll-API-Version` header. Leaving it
+unset returns the version-independent "compatible" models instead.
+
+```
+>>> client.get_bank_branches("0001", api_version="2025-01-01").data.branches["001"]
+[BankBranch(code='001', name='東京営業部', ...)]
+```
+
+The address, city and bank APIs additionally take a `version` argument, which
+pins the *database* version the query is performed against and defaults to the
+latest available one.
+
+```
+>>> client.get("1008105", version="2022-06-30")
+```
+
 ### module command
 
 To use kenallclient in command line, call kenallclient module.
@@ -208,4 +289,43 @@ $ python -m kenallclient search-holiday --from 2022-01-01 --to 2022-02-01
            'day_of_week': 1,
            'day_of_week_text': 'monday',
            'title': '成人の日'}]}
+```
+
+### search banks
+
+`search-banks` and `search-bank-branches` subcommands call the bank search APIs
+added in the 2026-08-01 API version.
+
+```
+$ python -m kenallclient search-banks --help
+usage: __main__.py search-banks [-h] [--query QUERY] [--match {prefix,contains}]
+                                [--type {bank,shinkin,shinkumi_rokin,nokyo_gyokyo,yucho}]
+                                [--version VERSION]
+```
+
+```
+$ python -m kenallclient --api-version 2026-08-01 search-banks -q みずほ --match contains
+{'data': [{'code': '0001',
+           'hiragana': 'みずほ',
+           'katakana': 'ミズホ',
+           'name': 'みずほ銀行',
+           'romaji': 'mizuho'}],
+ 'version': '2026-08-01'}
+```
+
+```
+$ python -m kenallclient --api-version 2026-08-01 search-bank-branches 0001 -q 横浜
+```
+
+### other subcommands
+
+`get-cities`, `get-invoice-issuer`, `check-business-day`, `whoami`,
+`get-banks`, `get-bank`, `get-bank-branches`, `get-bank-branch`, `get-school`
+and `search-school` cover the remaining endpoints. Pass `--api-version` before
+the subcommand to pin the API version:
+
+```
+$ python -m kenallclient --api-version 2026-08-01 get-cities 13
+$ python -m kenallclient whoami
+$ python -m kenallclient check-business-day 2022-01-04
 ```

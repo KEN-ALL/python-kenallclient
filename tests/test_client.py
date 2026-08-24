@@ -8,12 +8,13 @@ class DummyResponse(io.StringIO):
 
 
 # API version availability constants
-ALL_VERSIONS = ["2022-11-01", "2023-09-01", "2024-01-01", "2025-01-01"]
-POSTAL_VERSIONS = ["2022-11-01", "2023-09-01", "2024-01-01", "2025-01-01"]
-CORPORATE_VERSIONS = ["2024-01-01", "2025-01-01"]
-BANK_VERSIONS = ["2023-09-01", "2024-01-01", "2025-01-01"]
-INVOICE_VERSIONS = ["2024-01-01", "2025-01-01"]
-SCHOOL_VERSIONS = ["2025-01-01"]
+ALL_VERSIONS = ["2022-11-01", "2023-09-01", "2024-01-01", "2025-01-01", "2026-08-01"]
+POSTAL_VERSIONS = ["2022-11-01", "2023-09-01", "2024-01-01", "2025-01-01", "2026-08-01"]
+CORPORATE_VERSIONS = ["2024-01-01", "2025-01-01", "2026-08-01"]
+BANK_VERSIONS = ["2023-09-01", "2024-01-01", "2025-01-01", "2026-08-01"]
+BANK_SEARCH_VERSIONS = ["2026-08-01"]
+INVOICE_VERSIONS = ["2024-01-01", "2025-01-01", "2026-08-01"]
+SCHOOL_VERSIONS = ["2025-01-01", "2026-08-01"]
 
 
 def test_it():
@@ -688,7 +689,14 @@ def test_bank_branches_get_all_versions(mocker, load_version_fixture, api_versio
     # Verify response
     # Note: response version might differ from requested version, that's ok
     assert result.version is not None
-    assert len(result.data) > 0
+    assert result.data.bank.code == "0001"
+    assert len(result.data.branches) > 0
+    branch = result.data.branches["001"]
+    if api_version >= "2025-01-01":
+        # A branch code maps to an array of branches from 2025-01-01 on
+        assert branch[0].code == "001"
+    else:
+        assert branch.code == "001"
 
 
 @pytest.mark.parametrize("api_version", BANK_VERSIONS)
@@ -716,8 +724,12 @@ def test_bank_branch_get_all_versions(mocker, load_version_fixture, api_version)
     assert request.headers.get("Kenall-api-version") == api_version
 
     # Verify response
-    assert result.data[0]
-    assert result.data[0].code == "001"
+    assert result.data.bank.code == "0001"
+    if api_version >= "2025-01-01":
+        # `branch` holds an array of branches from 2025-01-01 on
+        assert result.data.branch[0].code == "001"
+    else:
+        assert result.data.branch.code == "001"
 
 
 # ============================================================================
@@ -1026,3 +1038,483 @@ def test_school_api_with_invalid_version(mocker):
     with pytest.raises(ValueError) as e:
         target.get_school("F113110102700", api_version="2024-01-01")
     assert "School API not available for version 2024-01-01" in str(e.value)
+
+
+# ============================================================================
+# Bank search API tests (available from 2026-08-01)
+# ============================================================================
+
+
+def query_of(request):
+    """Extract the query string of a request as a dict"""
+    import urllib.parse
+
+    return dict(urllib.parse.parse_qsl(urllib.parse.urlsplit(request.full_url).query))
+
+
+def test_search_banks_passes_every_parameter(mocker, banks_search_v20260801):
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(banks_search_v20260801))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    result = target.search_banks(
+        q="みずほ",
+        match="contains",
+        type="bank",
+        version="2026-08-01",
+        api_version="2026-08-01",
+    )
+
+    request = mock_urlopen.call_args[0][0]
+    assert request.full_url.startswith("https://api.kenall.jp/v1/bank?")
+    assert query_of(request) == {
+        "q": "みずほ",
+        "match": "contains",
+        "type": "bank",
+        "version": "2026-08-01",
+    }
+    assert request.headers["Authorization"] == "Token testing-api-key"
+    assert request.headers.get("Kenall-api-version") == "2026-08-01"
+
+    assert result.version == "2026-08-01"
+    assert len(result.data) == 1
+    assert result.data[0].code == "0001"
+    assert result.data[0].name == "みずほ銀行"
+
+
+def test_search_banks_omits_unset_parameters(mocker, banks_search_v20260801):
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(banks_search_v20260801))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    target.search_banks(q="みずほ")
+
+    request = mock_urlopen.call_args[0][0]
+    assert query_of(request) == {"q": "みずほ"}
+
+
+def test_search_banks_without_options_is_a_plain_listing(
+    mocker, banks_search_v20260801
+):
+    """No options at all leaves the URL identical to the one `get_banks` uses"""
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(banks_search_v20260801))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    target.search_banks()
+
+    request = mock_urlopen.call_args[0][0]
+    assert request.full_url == "https://api.kenall.jp/v1/bank"
+
+
+def test_search_banks_empty_result(mocker, banks_search_empty_v20260801):
+    """With `q` given, an empty result is a 200 with an empty `data`"""
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(banks_search_empty_v20260801))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    result = target.search_banks(q="ぴ", api_version="2026-08-01")
+
+    assert result.data == []
+
+
+def test_search_bank_branches_passes_every_parameter(
+    mocker, bank_branches_search_v20260801
+):
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(bank_branches_search_v20260801))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    result = target.search_bank_branches(
+        "0001",
+        q="横浜",
+        match="contains",
+        version="2026-08-01",
+        api_version="2026-08-01",
+    )
+
+    request = mock_urlopen.call_args[0][0]
+    assert request.full_url.startswith("https://api.kenall.jp/v1/bank/0001/branches?")
+    assert query_of(request) == {
+        "q": "横浜",
+        "match": "contains",
+        "version": "2026-08-01",
+    }
+    assert request.headers.get("Kenall-api-version") == "2026-08-01"
+
+    assert result.version == "2026-08-01"
+    assert result.data.bank.code == "0001"
+    assert result.data.branches["026"][0].name == "横浜支店"
+
+
+def test_search_bank_branches_without_options_is_a_plain_listing(
+    mocker, bank_branches_search_v20260801
+):
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(bank_branches_search_v20260801))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    target.search_bank_branches("0001")
+
+    request = mock_urlopen.call_args[0][0]
+    assert request.full_url == "https://api.kenall.jp/v1/bank/0001/branches"
+
+
+def test_search_bank_branches_empty_result(
+    mocker, bank_branches_search_empty_v20260801
+):
+    """With `q` given, an empty result is a 200 with no branches"""
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(bank_branches_search_empty_v20260801))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    result = target.search_bank_branches("0001", q="ぴ", api_version="2026-08-01")
+
+    assert result.data.branches == {}
+
+
+def test_search_bank_branches_compatible_result(mocker, bank_branches_search_v20260801):
+    """Without a pinned version the flattened compatible shape comes back"""
+    import json
+
+    from kenallclient.client import KenAllClient
+    from kenallclient.models import compatible
+
+    dummy_response = DummyResponse(json.dumps(bank_branches_search_v20260801))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    result = target.search_bank_branches("0001", q="横浜")
+
+    assert isinstance(result, compatible.BankBranchesResponse)
+    assert result.data["026"][0].name == "横浜支店"
+
+
+def test_create_bank_search_request_without_parameters():
+    from kenallclient.client import KenAllClient
+
+    target = KenAllClient("testing-api-key")
+    result = target.create_bank_search_request()
+    assert result.full_url == "https://api.kenall.jp/v1/bank"
+    assert result.headers == {"Authorization": "Token testing-api-key"}
+
+
+def test_create_bank_branches_search_request_without_parameters():
+    from kenallclient.client import KenAllClient
+
+    target = KenAllClient("testing-api-key")
+    result = target.create_bank_branches_search_request("0001")
+    assert result.full_url == "https://api.kenall.jp/v1/bank/0001/branches"
+    assert result.headers == {"Authorization": "Token testing-api-key"}
+
+
+@pytest.mark.parametrize("api_version", BANK_SEARCH_VERSIONS)
+def test_bank_search_all_versions(mocker, load_version_fixture, api_version):
+    """Test bank search endpoint across the versions that honor it"""
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    fixture_data = load_version_fixture(api_version, "banks_search.json")
+
+    dummy_response = DummyResponse(json.dumps(fixture_data))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    result = target.search_banks(q="みずほ", api_version=api_version)
+
+    request = mock_urlopen.call_args[0][0]
+    assert query_of(request) == {"q": "みずほ"}
+    assert request.headers.get("Kenall-api-version") == api_version
+
+    assert result.version is not None
+    assert len(result.data) > 0
+
+
+# ============================================================================
+# City resolver tests
+# ============================================================================
+
+
+@pytest.mark.parametrize("api_version", POSTAL_VERSIONS)
+def test_get_cities_all_versions(mocker, load_version_fixture, api_version):
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    fixture_data = load_version_fixture(api_version, "city_get.json")
+
+    dummy_response = DummyResponse(json.dumps(fixture_data))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    result = target.get_cities("13", api_version=api_version)
+
+    request = mock_urlopen.call_args[0][0]
+    assert request.full_url == "https://api.kenall.jp/v1/cities/13"
+    assert request.headers["Authorization"] == "Token testing-api-key"
+    assert request.headers.get("Kenall-api-version") == api_version
+
+    assert result.version is not None
+    assert result.data
+    assert result.data[0].jisx0402 is not None
+
+
+def test_get_cities_with_version(mocker, city_v20221101):
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(city_v20221101))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    target.get_cities("13", version="2022-06-30")
+
+    request = mock_urlopen.call_args[0][0]
+    assert request.full_url == "https://api.kenall.jp/v1/cities/13?version=2022-06-30"
+
+
+# ============================================================================
+# Invoice issuer API tests (available from 2024-01-01)
+# ============================================================================
+
+
+@pytest.mark.parametrize("api_version", INVOICE_VERSIONS)
+def test_get_invoice_issuer_all_versions(mocker, load_version_fixture, api_version):
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    fixture_data = load_version_fixture(api_version, "invoice_issuer_get.json")
+
+    dummy_response = DummyResponse(json.dumps(fixture_data))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    result = target.get_invoice_issuer("T1234567890123", api_version=api_version)
+
+    request = mock_urlopen.call_args[0][0]
+    assert request.full_url == "https://api.kenall.jp/v1/invoice/T1234567890123"
+    assert request.headers["Authorization"] == "Token testing-api-key"
+    assert request.headers.get("Kenall-api-version") == api_version
+
+    assert result.version is not None
+    assert result.data.qualified_invoice_issuer_number == "T1234567890123"
+
+
+def test_get_invoice_issuer_compatible(mocker, invoice_issuer_v20240101):
+    import json
+
+    from kenallclient.client import KenAllClient
+    from kenallclient.models import compatible
+
+    dummy_response = DummyResponse(json.dumps(invoice_issuer_v20240101))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    result = target.get_invoice_issuer("T1234567890123")
+
+    assert isinstance(result, compatible.NTAQualifiedInvoiceIssuerInfoResolverResponse)
+
+
+def test_invoice_api_with_invalid_version(mocker, invoice_issuer_v20240101):
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(invoice_issuer_v20240101))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+
+    # Invoice APIs are only available from 2024-01-01
+    with pytest.raises(ValueError) as e:
+        target.get_invoice_issuer("T1234567890123", api_version="2023-09-01")
+    assert "Invoice API not available for version 2023-09-01" in str(e.value)
+
+
+# ============================================================================
+# Whoami and business day APIs (not versioned)
+# ============================================================================
+
+
+def test_whoami(mocker, dummy_whoami_json):
+    import json
+
+    from kenallclient.client import KenAllClient
+    from kenallclient.models import compatible
+
+    dummy_response = DummyResponse(json.dumps(dummy_whoami_json))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    result = target.whoami()
+
+    request = mock_urlopen.call_args[0][0]
+    assert request.full_url == "https://api.kenall.jp/v1/whoami"
+    assert request.headers == {"Authorization": "Token testing-api-key"}
+
+    assert isinstance(result, compatible.WhoamiResponse)
+    assert result.remote_addr.type == "v4"
+    assert result.remote_addr.address == "192.0.2.1"
+
+
+def test_check_business_day(mocker, dummy_businessday_check_json):
+    import json
+
+    from kenallclient.client import KenAllClient
+    from kenallclient.models import compatible
+
+    dummy_response = DummyResponse(json.dumps(dummy_businessday_check_json))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    result = target.check_business_day("2022-01-04")
+
+    request = mock_urlopen.call_args[0][0]
+    assert (
+        request.full_url
+        == "https://api.kenall.jp/v1/businessdays/check?date=2022-01-04"
+    )
+    assert request.headers == {"Authorization": "Token testing-api-key"}
+
+    assert isinstance(result, compatible.BusinessDayCheckResponse)
+    assert result.result is True
+
+
+# ============================================================================
+# Postal code normalization and database version pinning
+# ============================================================================
+
+
+@pytest.mark.parametrize(
+    "postal_code,expected",
+    [
+        pytest.param("1008105", "1008105"),
+        pytest.param("100-8105", "1008105"),
+        # Only the NNN-NNNN form is rewritten; anything else is passed through
+        pytest.param("10-08105", "10-08105"),
+        pytest.param("100-81050", "100-81050"),
+    ],
+)
+def test_create_request_normalizes_postal_code(postal_code, expected):
+    from kenallclient.client import KenAllClient
+
+    target = KenAllClient("testing-api-key")
+    result = target.create_request(postal_code)
+    assert result.full_url == f"https://api.kenall.jp/v1/postalcode/{expected}"
+
+
+def test_get_with_version(mocker, postalcode_v20221101):
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(postalcode_v20221101))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    target.get("100-8105", version="2022-06-30")
+
+    request = mock_urlopen.call_args[0][0]
+    assert request.full_url == (
+        "https://api.kenall.jp/v1/postalcode/1008105?version=2022-06-30"
+    )
+
+
+def test_search_with_version(mocker, postalcode_search_v20221101):
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(postalcode_search_v20221101))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    target.search(q="東京都", t=None, version="2022-06-30")
+
+    request = mock_urlopen.call_args[0][0]
+    assert query_of(request) == {"q": "東京都", "version": "2022-06-30"}
+
+
+def test_search_accepts_q_alone(mocker, postalcode_search_v20221101):
+    """`q` and `t` are both optional, as they are in kenall-js"""
+    import json
+
+    from kenallclient.client import KenAllClient
+
+    dummy_response = DummyResponse(json.dumps(postalcode_search_v20221101))
+    dummy_response.headers = {"Content-Type": "application/json"}
+    mock_urlopen = mocker.patch("kenallclient.client.urllib.request.urlopen")
+    mock_urlopen.return_value = dummy_response
+
+    target = KenAllClient("testing-api-key")
+    target.search(q="神奈川県 AND 日本郵便")
+
+    request = mock_urlopen.call_args[0][0]
+    assert query_of(request) == {"q": "神奈川県 AND 日本郵便"}

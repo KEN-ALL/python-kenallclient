@@ -155,6 +155,44 @@ def houjinbangou_search_v20250101(load_version_fixture):
 
 
 @pytest.fixture
+def banks_search_v20260801(load_version_fixture):
+    return load_version_fixture("2026-08-01", "banks_search.json")
+
+
+@pytest.fixture
+def banks_search_empty_v20260801(load_version_fixture):
+    return load_version_fixture("2026-08-01", "banks_search_empty.json")
+
+
+@pytest.fixture
+def bank_branches_search_v20260801(load_version_fixture):
+    return load_version_fixture("2026-08-01", "bank_branches_search.json")
+
+
+@pytest.fixture
+def bank_branches_search_empty_v20260801(load_version_fixture):
+    return load_version_fixture("2026-08-01", "bank_branches_search_empty.json")
+
+
+@pytest.fixture
+def dummy_whoami_json():
+    import json
+
+    # Use common fixture (the API is not versioned)
+    with open(os.path.join(here, "fixtures/common/whoami.json")) as f:
+        return json.load(f)
+
+
+@pytest.fixture
+def dummy_businessday_check_json():
+    import json
+
+    # Use common fixture (the API is not versioned)
+    with open(os.path.join(here, "fixtures/common/businessday_check.json")) as f:
+        return json.load(f)
+
+
+@pytest.fixture
 def school_v20250101(load_version_fixture):
     return load_version_fixture("2025-01-01", "school_get.json")
 

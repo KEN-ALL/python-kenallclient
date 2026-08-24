@@ -1,0 +1,13 @@
+{
+  "version": "2026-08-01",
+  "data": {
+    "bank": {
+      "code": "0001",
+      "name": "みずほ銀行",
+      "katakana": "ミズホ",
+      "hiragana": "みずほ",
+      "romaji": "mizuho"
+    },
+    "branches": {}
+  }
+}
